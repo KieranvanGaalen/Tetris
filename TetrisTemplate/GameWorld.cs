@@ -16,7 +16,6 @@ class GameWorld
         Playing,
         GameOver
     }
-
     /// <summary>
     /// The random-number generator of the game.
     /// </summary>
@@ -60,7 +59,6 @@ class GameWorld
     {
         spriteBatch.Begin();
         grid.Draw(gameTime, spriteBatch);
-        spriteBatch.DrawString(font, "Hello!", Vector2.Zero, Color.Blue);
         spriteBatch.End();
     }
 
