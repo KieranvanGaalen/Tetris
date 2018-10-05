@@ -8,7 +8,6 @@ class TetrisGame : Game
     SpriteBatch spriteBatch;
     InputHelper inputHelper;
     GameWorld gameWorld;
-
     /// <summary>
     /// A static reference to the ContentManager object, used for loading assets.
     /// </summary>

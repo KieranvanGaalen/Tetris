@@ -39,6 +39,7 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="TetrisBlock.cs" />
     <Compile Include="GameWorld.cs" />
     <Compile Include="InputHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

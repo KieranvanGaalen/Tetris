@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
-
 /// <summary>
 /// A class for representing the Tetris playing grid.
 /// </summary>
@@ -13,14 +12,23 @@ class TetrisGrid
     public int Width { get { return 12; } } // The number of grid elements in the x-direction.
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     Random random = new Random();
+    public Color[,] grid = new Color[12, 20];
+    
     Color mycolor;
-    enum ShapeColors {Blue, Red, Green, Yellow, Purple, Orange, Pink};
+    public void colorofzo()
+    {
+        grid[6, 6] = Color.Green;
+    }
     /// <summary>
     /// Creates a new TetrisGrid.
     /// </summary>
     /// <param name="b"></param>
     public TetrisGrid()
     {
+        colorofzo();
+        Tpiece.tpiece();
+        TetrisBlock.NewBlock();
+        Lpiece.lpiece();
         int RRandom = random.Next(10, 240), GRandom = random.Next(10, 240), BRandom = random.Next(10, 240);
         mycolor = new Color(RRandom, GRandom, BRandom);
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
@@ -48,8 +56,35 @@ class TetrisGrid
         }
         position = new Vector2(220, 0);
 
+        for (int i = 0; i < Width; i++)
+        {
+            for (int f = 0; f < Height; f++)
+            {
+                if (grid[i,f] != null)
+                {
+                    spriteBatch.Draw(emptyCell, position, grid[i,f]);
+                }
+                position.Y += 30;
+            }
+            position.Y = 0;
+            position.X += 30;
+        }
+        position = new Vector2(220, 0);
 
-
+        for (int i = 0; i < TetrisBlock.BlockGrid.GetLength(0); i++)
+        {
+            for (int f = 0; f < TetrisBlock.BlockGrid.GetLength(1); f++)
+            {
+                if (TetrisBlock.BlockGrid[i, f] == true)
+                {
+                    spriteBatch.Draw(emptyCell, position, Color.Blue);
+                }
+                position.Y += 30;
+            }
+            position.Y = 0;
+            position.X += 30;
+        }
+        position = new Vector2(220, 0);
     }
 
     /// <summary>
