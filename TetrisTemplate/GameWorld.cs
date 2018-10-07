@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 
 /// <summary>
@@ -8,6 +9,7 @@ using System;
 /// </summary>
 class GameWorld
 {
+    static public int Level = 1;
     /// <summary>
     /// An enum for the different game states that the game can have.
     /// </summary>
@@ -35,7 +37,7 @@ class GameWorld
     /// <summary>
     /// The main grid of the game.
     /// </summary>
-    TetrisGrid grid;
+    TetrisGrid grid; 
 
     public GameWorld()
     {
@@ -49,10 +51,12 @@ class GameWorld
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
     {
+        grid.HandleInput(gameTime, inputHelper, Keys.A, Keys.D);
     }
 
     public void Update(GameTime gameTime)
     {
+        grid.Update(gameTime);
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
