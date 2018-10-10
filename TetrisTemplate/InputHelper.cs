@@ -58,7 +58,6 @@ class InputHelper
     public bool KeyDown(Keys k)
     {
         return currentKeyboardState.IsKeyDown(k);
-
     }
 
 

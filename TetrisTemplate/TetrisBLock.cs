@@ -18,15 +18,39 @@ class TetrisBlock
     public bool[,] BlockGrid = new bool[3, 3];
     public Vector2 BlockPosition = new Vector2(4, 0);
     public Color color;
+    public TetrisGrid parent; //Wordt gebruikt om variablen van de grid beschikbaar te maken voor de vallende blokken.
+
+    public TetrisBlock(TetrisGrid parent)
+    {
+        this.parent = parent;
+    }
 
     public bool IsBlockBelow()
     {
+        for (int i = 0; i < BlockGrid.GetLength(0); i++)
+        {
+            for (int f = 0; f < BlockGrid.GetLength(1); f++)
+            {
+                if (BlockGrid[i, f] && (parent.grid[(int)BlockPosition.X + i, (int)BlockPosition.Y + f + 1] != Color.White ||
+                    BlockPosition.Y == parent.grid.GetLength(1) - BlockGrid.GetLength(1)))
+                    return true;
+            }
+        }
         //Kijken of het bewegende blok nog 1 naar beneden kan. Zoniet dan zit er een blok onder.
         return false;
     }
 
     private void PlaceBlock()
     {
+        for (int i = 0; i < BlockGrid.GetLength(0); i++)
+        {
+            for (int f = 0; f < BlockGrid.GetLength(1); f++)
+            {
+                if (BlockGrid[i, f])
+                    parent.grid[(int)BlockPosition.X + i, (int)BlockPosition.Y + f] = color;
+            }
+        }
+        parent.NewBlock();
         //Hier nog iets van code dat er voorzorgt dat het blok vast staat in de grid.
         //Checken of er een lijn gevuld is en punten geven. (Misschien aparte methode voor maken.)
     }
@@ -36,7 +60,10 @@ class TetrisBlock
     {
         if (gameTime.TotalGameTime.Ticks % (60 / GameWorld.Level) == 0)
         {
-            BlockPosition.Y += 1;
+            if (IsBlockBelow())
+                PlaceBlock();
+            else
+                BlockPosition.Y += 1;
         }
     }
 
@@ -61,15 +88,6 @@ class TetrisBlock
             position.Y = 30 * BlockPosition.Y;
             position.X += 30;
         }
-
-    }
-
-    //Plaatst een nieuw blok bovenaan de grid
-    public void NewBlock()
-    {
-
-        BlockPosition.X = 4;
-        BlockPosition.Y = 0;
     }
 
     //Roteert een blok tegen de klok in.
@@ -112,7 +130,7 @@ class TetrisBlock
 
 class Opiece : TetrisBlock
 {
-    public Opiece()
+    public Opiece(TetrisGrid parent) : base(parent)
     {
         color = Color.Yellow;
         BlockGrid = new bool[4, 4];
@@ -125,7 +143,7 @@ class Opiece : TetrisBlock
 
 class Ipiece : TetrisBlock
 {
-    public Ipiece()
+    public Ipiece(TetrisGrid parent) : base(parent)
     {
         color = Color.CornflowerBlue;
         BlockGrid = new bool[4, 4];
@@ -138,7 +156,7 @@ class Ipiece : TetrisBlock
 
 class Spiece : TetrisBlock
 {
-    public Spiece()
+    public Spiece(TetrisGrid parent) : base(parent)
     {
         color = Color.LightGreen;
         BlockGrid[0, 1] = true;
@@ -150,7 +168,7 @@ class Spiece : TetrisBlock
 
 class Zpiece : TetrisBlock
 {
-    public Zpiece()
+    public Zpiece(TetrisGrid parent) : base(parent)
     {
         color = Color.Red;
         BlockGrid[0, 0] = true;
@@ -162,7 +180,7 @@ class Zpiece : TetrisBlock
 
 class Lpiece : TetrisBlock
 {
-    public Lpiece()
+    public Lpiece(TetrisGrid parent) : base(parent)
     {
         color = Color.Blue;
         BlockGrid[1, 0] = true;
@@ -174,7 +192,7 @@ class Lpiece : TetrisBlock
 
 class Jpiece : TetrisBlock
 {
-    public Jpiece()
+    public Jpiece(TetrisGrid parent) : base(parent)
     {
         color = Color.Orange;
         BlockGrid[1, 0] = true;
@@ -186,7 +204,7 @@ class Jpiece : TetrisBlock
 
 class Tpiece : TetrisBlock
 {
-    public Tpiece()
+    public Tpiece(TetrisGrid parent) : base(parent)
     {
         color = Color.Purple;
         BlockGrid[0, 0] = true;

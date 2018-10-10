@@ -60,6 +60,8 @@ class TetrisGame : Game
         inputHelper.Update(gameTime);
         gameWorld.HandleInput(gameTime, inputHelper);
         gameWorld.Update(gameTime);
+        if (inputHelper.KeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+            Exit();
     }
 
     protected override void Draw(GameTime gameTime)

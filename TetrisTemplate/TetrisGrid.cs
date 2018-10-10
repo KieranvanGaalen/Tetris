@@ -15,7 +15,7 @@ class TetrisGrid
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     Random random = new Random();
     public Color[,] grid = new Color[12, 20];
-    TetrisBlock Block = new Zpiece();
+    TetrisBlock Block;
 
     /// <summary>
     /// Creates a new TetrisGrid.
@@ -23,8 +23,12 @@ class TetrisGrid
     /// <param name="b"></param>
     public TetrisGrid()
     {
+        Clear();
         grid[6, 6] = Color.Green; //Dit is alleen om te testen en moet later verwijderd worden.
+        grid[6, 7] = Color.White; //Dit is alleen om te testen en moet later verwijderd worden.
+        grid[6, 8] = Color.Gray; //Dit is alleen om te testen en moet later verwijderd worden.
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
+        Block = new Ipiece(this);
     }
 
     //Update methode voor de TetrisGrid.
@@ -36,17 +40,17 @@ class TetrisGrid
     //HandleInput methode voor de TetrisGrid.
     public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys Test)
     {
-        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
+        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0 && Block.BlockPosition.X < 12 - Block.BlockGrid.GetLength(0))
             Block.BlockPosition.X += 1;
-        else if (inputHelper.KeyDown(LeftMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
+        else if (inputHelper.KeyDown(LeftMove) && gameTime.TotalGameTime.Ticks % 6 == 0 && Block.BlockPosition.X > 0)
             Block.BlockPosition.X -= 1;
         if (inputHelper.KeyPressed(RotateCCW))
             Block.BlockGrid = TetrisBlock.RotateCounterClockwise(Block.BlockGrid);
         else if (inputHelper.KeyPressed(RotateCW))
             Block.BlockGrid = TetrisBlock.RotateClockwise(Block.BlockGrid);
 
-        if (inputHelper.KeyPressed(Test))
-            NewBlock();
+        if (inputHelper.KeyPressed(Test)) //Dit is alleen om te testen en moet later verwijderd worden.
+            Clear(); //Dit is alleen om te testen en moet later verwijderd worden.
     }
 
     /// <summary>
@@ -57,28 +61,12 @@ class TetrisGrid
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         Vector2 position = BeginPosition;
-        //Tekent de achtergrondgrid
+        //Tekent de gelkeurde blokjes en de achtergrond grid.
         for (int i = 0; i < Width; i++)
         {
             for (int f = 0; f < Height; f++)
             {
-                spriteBatch.Draw(emptyCell, position, Color.White);
-                position.Y += 30;
-            }
-            position.Y = 0;
-            position.X += 30;
-        }
-
-        //Tekent de gelkeurde blokjes over de achtergrond grid heen.
-        position = BeginPosition;
-        for (int i = 0; i < Width; i++)
-        {
-            for (int f = 0; f < Height; f++)
-            {
-                if (grid[i, f] != null)
-                {
-                    spriteBatch.Draw(emptyCell, position, grid[i, f]);
-                }
+                spriteBatch.Draw(emptyCell, position, grid[i, f]);
                 position.Y += 30;
             }
             position.Y = 0;
@@ -93,25 +81,25 @@ class TetrisGrid
         switch (GameWorld.Random.Next(7))
         {
             case 0:
-                Block = new Opiece();
+                Block = new Opiece(this);
                 break;
             case 1:
-                Block = new Ipiece();
+                Block = new Ipiece(this);
                 break;
             case 2:
-                Block = new Lpiece();
+                Block = new Lpiece(this);
                 break;
             case 3:
-                Block = new Jpiece();
+                Block = new Jpiece(this);
                 break;
             case 4:
-                Block = new Spiece();
+                Block = new Spiece(this);
                 break;
             case 5:
-                Block = new Zpiece();
+                Block = new Zpiece(this);
                 break;
             case 6:
-                Block = new Tpiece();
+                Block = new Tpiece(this);
                 break;
         }
     }
@@ -120,6 +108,17 @@ class TetrisGrid
     /// </summary>
     public void Clear()
     {
+        Vector2 position = BeginPosition;
+        for (int i = 0; i < Width; i++)
+        {
+            for (int f = 0; f < Height; f++)
+            {
+                grid[i,f] = Color.White;
+                position.Y += 30;
+            }
+            position.Y = 0;
+            position.X += 30;
+        }
     }
     
 }
