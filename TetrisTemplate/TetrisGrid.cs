@@ -14,7 +14,7 @@ class TetrisGrid
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     Random random = new Random();
     public Color[,] grid = new Color[12, 20];
-    TetrisBlock Block = new Jpiece();
+    TetrisBlock Block = new Ipiece();
 
     Color mycolor;
     
@@ -41,12 +41,16 @@ class TetrisGrid
     }
 
     //HandleInput methode voor de TetrisGrid.
-    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove)
+    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove,Keys RotateCW, Keys RotateCCW)
     {
         if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
             Block.BlockPosition.X += 1;
         else if (inputHelper.KeyDown(LeftMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
             Block.BlockPosition.X -= 1;
+        if (inputHelper.KeyPressed(RotateCCW))
+            Block.BlockGrid = TetrisBlock.RotateCounterClockwise(Block.BlockGrid);
+        else if (inputHelper.KeyPressed(RotateCW))
+            Block.BlockGrid = TetrisBlock.RotateClockwise(Block.BlockGrid);
     }
 
     /// <summary>

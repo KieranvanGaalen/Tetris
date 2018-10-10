@@ -16,10 +16,8 @@ class TetrisBlock
        3 false true false false
         Het middelpunt voor o.a. rotatie word 1,1 (de tweede true van boven) */
     public bool[,] BlockGrid = new bool[3, 3];
-    public bool[,] BlockGrid4x4 = new bool[4, 4];
-    public bool[,] PreviousBlockGrid = new bool[3, 3];
-    public Vector2 BlockPosition = new Vector2(4,0);
-    
+    public Vector2 BlockPosition = new Vector2(4, 0);
+
     public bool IsBlockBelow()
     {
         //Kijken of het bewegende blok nog 1 naar beneden kan. Zoniet dan zit er een blok onder.
@@ -67,7 +65,7 @@ class TetrisBlock
             position.Y = 30 * BlockPosition.Y;
             position.X += 30;
         }
-        
+
     }
 
     //Plaatst een nieuw blok bovenaan de grid
@@ -88,31 +86,39 @@ class TetrisBlock
     }
 
     //Roteert een blok tegen de klok in.
-    public void BlockRotationCCW()
+    public static bool[,] RotateCounterClockwise(bool[,] oldBlock)
     {
-        PreviousBlockGrid = BlockGrid;
-        BlockGrid[0, 0] = PreviousBlockGrid[2, 0];
-        BlockGrid[0, 1] = PreviousBlockGrid[1, 0];
-        BlockGrid[0, 2] = PreviousBlockGrid[0, 0];
-        BlockGrid[1, 2] = PreviousBlockGrid[0, 1];
-        BlockGrid[2, 2] = PreviousBlockGrid[0, 2];
-        BlockGrid[2, 1] = PreviousBlockGrid[1, 2];
-        BlockGrid[2, 0] = PreviousBlockGrid[2, 2];
-        BlockGrid[1, 0] = PreviousBlockGrid[2, 1];
+        bool[,] newBlock = new bool[oldBlock.GetLength(1), oldBlock.GetLength(0)];
+        int oldColumn = 0, oldRow;
+        for (int newRow = 0; newRow < newBlock.GetLength(0); newRow++)
+        {
+            oldRow = 0;
+            for (int newColumn = newBlock.GetLength(1) - 1; newColumn >= 0; newColumn--)
+            {
+                newBlock[newRow, newColumn] = oldBlock[oldRow, oldColumn];
+                oldRow++;
+            }
+            oldColumn++;
+        }
+        return newBlock;
     }
 
     //Roteert een blok met de klok mee.
-    public void BlockRotationCW()
+    public static bool[,] RotateClockwise(bool[,] oldBlock)
     {
-        PreviousBlockGrid = BlockGrid;
-        BlockGrid[0, 0] = PreviousBlockGrid[0, 2];
-        BlockGrid[0, 1] = PreviousBlockGrid[1, 2];
-        BlockGrid[0, 2] = PreviousBlockGrid[2, 2];
-        BlockGrid[1, 2] = PreviousBlockGrid[2, 1];
-        BlockGrid[2, 2] = PreviousBlockGrid[2, 0];
-        BlockGrid[2, 1] = PreviousBlockGrid[1, 2];
-        BlockGrid[2, 0] = PreviousBlockGrid[0, 0];
-        BlockGrid[1, 0] = PreviousBlockGrid[0, 1];
+        bool[,] newBlock = new bool[oldBlock.GetLength(1), oldBlock.GetLength(0)];
+        int newColumn, newRow = 0;
+        for (int oldColumn = oldBlock.GetLength(1) - 1; oldColumn >= 0; oldColumn--)
+        {
+            newColumn = 0;
+            for (int oldRow = 0; oldRow < oldBlock.GetLength(0); oldRow++)
+            {
+                newBlock[newRow, newColumn] = oldBlock[oldRow, oldColumn];
+                newColumn++;
+            }
+            newRow++;
+        }
+        return newBlock;
     }
 
 }
@@ -121,10 +127,11 @@ class Opiece : TetrisBlock
 {
     public Opiece()
     {
-        BlockGrid4x4[1, 1] = true;
-        BlockGrid4x4[1, 2] = true;
-        BlockGrid4x4[2, 1] = true;
-        BlockGrid4x4[2, 2] = true;
+        BlockGrid = new bool[4, 4];
+        BlockGrid[1, 1] = true;
+        BlockGrid[1, 2] = true;
+        BlockGrid[2, 1] = true;
+        BlockGrid[2, 2] = true;
     }
 }
 
@@ -132,10 +139,11 @@ class Ipiece : TetrisBlock
 {
     public Ipiece()
     {
-        BlockGrid4x4[1, 0] = true;
-        BlockGrid4x4[1, 1] = true;
-        BlockGrid4x4[1, 2] = true;
-        BlockGrid4x4[1, 3] = true;
+        BlockGrid = new bool[4, 4];
+        BlockGrid[1, 0] = true;
+        BlockGrid[1, 1] = true;
+        BlockGrid[1, 2] = true;
+        BlockGrid[1, 3] = true;
     }
 }
 
