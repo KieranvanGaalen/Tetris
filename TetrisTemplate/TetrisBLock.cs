@@ -17,6 +17,7 @@ class TetrisBlock
         Het middelpunt voor o.a. rotatie word 1,1 (de tweede true van boven) */
     public bool[,] BlockGrid = new bool[3, 3];
     public Vector2 BlockPosition = new Vector2(4, 0);
+    public Color color;
 
     public bool IsBlockBelow()
     {
@@ -36,11 +37,6 @@ class TetrisBlock
         if (gameTime.TotalGameTime.Ticks % (60 / GameWorld.Level) == 0)
         {
             BlockPosition.Y += 1;
-            if (IsBlockBelow())
-            {
-                PlaceBlock();
-                NewBlock();
-            }
         }
     }
 
@@ -58,7 +54,7 @@ class TetrisBlock
             {
                 if (BlockGrid[i, f] == true)
                 {
-                    spriteBatch.Draw(TetrisGrid.emptyCell, position, Color.Blue);
+                    spriteBatch.Draw(TetrisGrid.emptyCell, position, color);
                 }
                 position.Y += 30;
             }
@@ -69,20 +65,11 @@ class TetrisBlock
     }
 
     //Plaatst een nieuw blok bovenaan de grid
-    public void NewBlock() //Deze methode wordt waarschijnlijk overbodig, omdat er iedere keer dat er een nieuw blok verschijnt
-    {                      //een andere class aangeroepen moet worden speciaal voor dat blok waardoor alles automatisch reset.
+    public void NewBlock()
+    {
+
         BlockPosition.X = 4;
         BlockPosition.Y = 0;
-        for (int i = 0; i < BlockGrid.GetLength(0); i++)
-        {
-            for (int f = 0; f < BlockGrid.GetLength(1); f++)
-            {
-                BlockGrid[i, f] = false;
-            }
-        }
-        // ̶H̶i̶e̶r̶ ̶n̶o̶g̶ ̶e̶e̶n̶ ̶m̶e̶t̶h̶o̶d̶e̶ ̶t̶o̶e̶v̶o̶e̶g̶e̶n̶ ̶o̶m̶ ̶e̶e̶n̶ ̶r̶a̶n̶d̶o̶m̶ ̶b̶l̶o̶k̶ ̶e̶r̶i̶n̶ ̶t̶e̶ ̶z̶e̶t̶t̶e̶n̶.
-        // De verschillende blokken zijn aparte classes die alle methoden van deze class doorkrijgen, 
-        // Dus moet een objocet van 1 van die classes aangemaakt worden. (op willekeurige wijze.)
     }
 
     //Roteert een blok tegen de klok in.
@@ -127,6 +114,7 @@ class Opiece : TetrisBlock
 {
     public Opiece()
     {
+        color = Color.Yellow;
         BlockGrid = new bool[4, 4];
         BlockGrid[1, 1] = true;
         BlockGrid[1, 2] = true;
@@ -139,6 +127,7 @@ class Ipiece : TetrisBlock
 {
     public Ipiece()
     {
+        color = Color.CornflowerBlue;
         BlockGrid = new bool[4, 4];
         BlockGrid[1, 0] = true;
         BlockGrid[1, 1] = true;
@@ -151,6 +140,7 @@ class Spiece : TetrisBlock
 {
     public Spiece()
     {
+        color = Color.LightGreen;
         BlockGrid[0, 1] = true;
         BlockGrid[1, 1] = true;
         BlockGrid[1, 0] = true;
@@ -162,9 +152,10 @@ class Zpiece : TetrisBlock
 {
     public Zpiece()
     {
+        color = Color.Red;
         BlockGrid[0, 0] = true;
-        BlockGrid[0, 1] = true;
         BlockGrid[1, 1] = true;
+        BlockGrid[1, 0] = true;
         BlockGrid[2, 1] = true;
     }
 }
@@ -173,6 +164,7 @@ class Lpiece : TetrisBlock
 {
     public Lpiece()
     {
+        color = Color.Blue;
         BlockGrid[1, 0] = true;
         BlockGrid[1, 1] = true;
         BlockGrid[1, 2] = true;
@@ -184,6 +176,7 @@ class Jpiece : TetrisBlock
 {
     public Jpiece()
     {
+        color = Color.Orange;
         BlockGrid[1, 0] = true;
         BlockGrid[1, 1] = true;
         BlockGrid[1, 2] = true;
@@ -195,9 +188,10 @@ class Tpiece : TetrisBlock
 {
     public Tpiece()
     {
-        BlockGrid[0, 1] = true;
+        color = Color.Purple;
+        BlockGrid[0, 0] = true;
+        BlockGrid[1, 0] = true;
+        BlockGrid[2, 0] = true;
         BlockGrid[1, 1] = true;
-        BlockGrid[2, 1] = true;
-        BlockGrid[1, 2] = true;
     }
 }

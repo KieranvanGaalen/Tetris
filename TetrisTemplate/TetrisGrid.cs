@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// A class for representing the Tetris playing grid.
@@ -9,28 +10,20 @@ using System;
 class TetrisGrid
 {
     public static Texture2D emptyCell; // The sprite of a single empty cell in the grid.
-    public static Vector2 BeginPosition = new Vector2 (220,0);// The position at which this TetrisGrid should be drawn. Also used to draw the collored blocks.
+    public static Vector2 BeginPosition = new Vector2(220, 0);// The position at which this TetrisGrid should be drawn. Also used to draw the collored blocks.
     public int Width { get { return 12; } } // The number of grid elements in the x-direction.
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     Random random = new Random();
     public Color[,] grid = new Color[12, 20];
-    TetrisBlock Block = new Ipiece();
+    TetrisBlock Block = new Zpiece();
 
-    Color mycolor;
-    
-    public void colorofzo() //Deze methode is alleen om te testen en moet later verwijderd worden.
-    {
-        grid[6, 6] = Color.Green;
-    }
     /// <summary>
     /// Creates a new TetrisGrid.
     /// </summary>
     /// <param name="b"></param>
     public TetrisGrid()
     {
-        colorofzo(); //Dit is alleen om te testen en moet later verwijderd worden.
-        int RRandom = random.Next(10, 240), GRandom = random.Next(10, 240), BRandom = random.Next(10, 240);
-        mycolor = new Color(RRandom, GRandom, BRandom);
+        grid[6, 6] = Color.Green; //Dit is alleen om te testen en moet later verwijderd worden.
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
     }
 
@@ -41,7 +34,7 @@ class TetrisGrid
     }
 
     //HandleInput methode voor de TetrisGrid.
-    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove,Keys RotateCW, Keys RotateCCW)
+    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys Test)
     {
         if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
             Block.BlockPosition.X += 1;
@@ -51,6 +44,9 @@ class TetrisGrid
             Block.BlockGrid = TetrisBlock.RotateCounterClockwise(Block.BlockGrid);
         else if (inputHelper.KeyPressed(RotateCW))
             Block.BlockGrid = TetrisBlock.RotateClockwise(Block.BlockGrid);
+
+        if (inputHelper.KeyPressed(Test))
+            NewBlock();
     }
 
     /// <summary>
@@ -72,16 +68,16 @@ class TetrisGrid
             position.Y = 0;
             position.X += 30;
         }
-        
+
         //Tekent de gelkeurde blokjes over de achtergrond grid heen.
         position = BeginPosition;
         for (int i = 0; i < Width; i++)
         {
             for (int f = 0; f < Height; f++)
             {
-                if (grid[i,f] != null)
+                if (grid[i, f] != null)
                 {
-                    spriteBatch.Draw(emptyCell, position, grid[i,f]);
+                    spriteBatch.Draw(emptyCell, position, grid[i, f]);
                 }
                 position.Y += 30;
             }
@@ -92,11 +88,38 @@ class TetrisGrid
         Block.Draw(gameTime, spriteBatch);
     }
 
+    public void NewBlock()
+    {
+        switch (GameWorld.Random.Next(7))
+        {
+            case 0:
+                Block = new Opiece();
+                break;
+            case 1:
+                Block = new Ipiece();
+                break;
+            case 2:
+                Block = new Lpiece();
+                break;
+            case 3:
+                Block = new Jpiece();
+                break;
+            case 4:
+                Block = new Spiece();
+                break;
+            case 5:
+                Block = new Zpiece();
+                break;
+            case 6:
+                Block = new Tpiece();
+                break;
+        }
+    }
     /// <summary>
     /// Clears the grid.
     /// </summary>
     public void Clear()
     {
     }
+    
 }
-

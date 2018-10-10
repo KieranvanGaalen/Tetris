@@ -51,7 +51,7 @@ class GameWorld
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
     {
-        grid.HandleInput(gameTime, inputHelper, Keys.A, Keys.D, Keys.W, Keys.S);
+        grid.HandleInput(gameTime, inputHelper, Keys.A, Keys.D, Keys.W, Keys.S, Keys.T);
     }
 
     public void Update(GameTime gameTime)
