@@ -14,7 +14,7 @@ class TetrisGrid
     public int Width { get { return 12; } } // The number of grid elements in the x-direction.
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     Random random = new Random();
-    public Color[,] grid = new Color[12, 20];
+    public Color[,] grid = new Color[16, 22];
     TetrisBlock Block;
 
     /// <summary>
@@ -24,9 +24,9 @@ class TetrisGrid
     public TetrisGrid()
     {
         Clear();
-        grid[6, 6] = Color.Green; //Dit is alleen om te testen en moet later verwijderd worden.
-        grid[6, 7] = Color.White; //Dit is alleen om te testen en moet later verwijderd worden.
-        grid[6, 8] = Color.Gray; //Dit is alleen om te testen en moet later verwijderd worden.
+        //grid[8, 6] = Color.Green; //Dit is alleen om te testen en moet later verwijderd worden.
+        //grid[8, 7] = Color.White; //Dit is alleen om te testen en moet later verwijderd worden.
+        //grid[8, 8] = Color.Gray; //Dit is alleen om te testen en moet later verwijderd worden.
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
         Block = new Ipiece(this);
     }
@@ -40,10 +40,48 @@ class TetrisGrid
     //HandleInput methode voor de TetrisGrid.
     public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys Test)
     {
-        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0 && Block.BlockPosition.X < 12 - Block.BlockGrid.GetLength(0))
-            Block.BlockPosition.X += 1;
-        else if (inputHelper.KeyDown(LeftMove) && gameTime.TotalGameTime.Ticks % 6 == 0 && Block.BlockPosition.X > 0)
-            Block.BlockPosition.X -= 1;
+        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
+        {
+            for (int i = Block.BlockGrid.GetLength(0) - 1; i >= 0; i--)
+            {
+                for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
+                {
+                    if (Block.BlockGrid[i, f])
+                    {
+                        if (grid[(int)Block.BlockPosition.X + i + 1, (int)Block.BlockPosition.Y + f] == Color.White)
+                        {
+                            Block.BlockPosition.X++;
+                            return;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        else if (inputHelper.KeyDown(LeftMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
+        {
+            for (int i = 0; i < Block.BlockGrid.GetLength(0); i++)
+            {
+                for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
+                {
+                    if (Block.BlockGrid[i, f])
+                    {
+                        if (grid[(int)Block.BlockPosition.X + i - 1, (int)Block.BlockPosition.Y + f] == Color.White)
+                        {
+                            Block.BlockPosition.X--;
+                            return;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
         if (inputHelper.KeyPressed(RotateCCW))
             Block.BlockGrid = TetrisBlock.RotateCounterClockwise(Block.BlockGrid);
         else if (inputHelper.KeyPressed(RotateCW))
@@ -61,12 +99,12 @@ class TetrisGrid
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         Vector2 position = BeginPosition;
-        //Tekent de gelkeurde blokjes en de achtergrond grid.
+        //Tekent de gekleurde blokjes en de achtergrond grid.
         for (int i = 0; i < Width; i++)
         {
             for (int f = 0; f < Height; f++)
             {
-                spriteBatch.Draw(emptyCell, position, grid[i, f]);
+                spriteBatch.Draw(emptyCell, position, grid[i + 2, f]);
                 position.Y += 30;
             }
             position.Y = 0;
@@ -113,7 +151,7 @@ class TetrisGrid
         {
             for (int f = 0; f < Height; f++)
             {
-                grid[i,f] = Color.White;
+                grid[i + 2,f] = Color.White;
                 position.Y += 30;
             }
             position.Y = 0;
