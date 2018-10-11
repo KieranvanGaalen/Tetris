@@ -40,6 +40,7 @@ class TetrisGrid
     //HandleInput methode voor de TetrisGrid.
     public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys Test)
     {
+        int moveLegit = 0;
         if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
         {
             for (int i = Block.BlockGrid.GetLength(0) - 1; i >= 0; i--)
@@ -50,15 +51,15 @@ class TetrisGrid
                     {
                         if (grid[(int)Block.BlockPosition.X + i + 1, (int)Block.BlockPosition.Y + f] == Color.White)
                         {
-                            Block.BlockPosition.X++;
-                            return;
-                        }
-                        else
-                        {
-                            return;
+                            moveLegit++;
                         }
                     }
                 }
+            }
+            if (moveLegit == 4)
+            {
+                Block.BlockPosition.X++;
+                moveLegit = 0;
             }
         }
         else if (inputHelper.KeyDown(LeftMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
@@ -71,21 +72,54 @@ class TetrisGrid
                     {
                         if (grid[(int)Block.BlockPosition.X + i - 1, (int)Block.BlockPosition.Y + f] == Color.White)
                         {
-                            Block.BlockPosition.X--;
-                            return;
+                            moveLegit++;
                         }
-                        else
+                    }
+                }
+            }
+            if (moveLegit == 4)
+            {
+                Block.BlockPosition.X--;
+                moveLegit = 0;
+            }
+        }
+
+        if (inputHelper.KeyPressed(RotateCCW))
+        {
+            Block.BlockGrid = TetrisBlock.RotateCounterClockwise(Block.BlockGrid);
+            for (int i = 0; i < Block.BlockGrid.GetLength(0); i++)
+            {
+                for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
+                {
+                    if (Block.BlockGrid[i, f])
+                    {
+                        if (grid[(int)Block.BlockPosition.X + i, (int)Block.BlockPosition.Y + f] != Color.White)
                         {
+                            Block.BlockGrid = TetrisBlock.RotateClockwise(Block.BlockGrid);
                             return;
                         }
                     }
                 }
             }
         }
-        if (inputHelper.KeyPressed(RotateCCW))
-            Block.BlockGrid = TetrisBlock.RotateCounterClockwise(Block.BlockGrid);
         else if (inputHelper.KeyPressed(RotateCW))
+        {
             Block.BlockGrid = TetrisBlock.RotateClockwise(Block.BlockGrid);
+            for (int i = 0; i < Block.BlockGrid.GetLength(0); i++)
+            {
+                for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
+                {
+                    if (Block.BlockGrid[i, f])
+                    {
+                        if (grid[(int)Block.BlockPosition.X + i, (int)Block.BlockPosition.Y + f] != Color.White)
+                        {
+                            Block.BlockGrid = TetrisBlock.RotateCounterClockwise(Block.BlockGrid);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
 
         if (inputHelper.KeyPressed(Test)) //Dit is alleen om te testen en moet later verwijderd worden.
             Clear(); //Dit is alleen om te testen en moet later verwijderd worden.
@@ -147,11 +181,11 @@ class TetrisGrid
     public void Clear()
     {
         Vector2 position = BeginPosition;
-        for (int i = 0; i < Width; i++)
+        for (int i = 2; i < Width + 2; i++)
         {
             for (int f = 0; f < Height; f++)
             {
-                grid[i + 2,f] = Color.White;
+                grid[i ,f] = Color.White;
                 position.Y += 30;
             }
             position.Y = 0;
