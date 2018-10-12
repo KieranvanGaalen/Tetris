@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -16,6 +17,10 @@ class TetrisGrid
     Random random = new Random();
     public Color[,] grid = new Color[16, 22]; //De grid is groter dan wat getekend wordt want anders valt de blockgrid buiten de array, de array wordt 2 rechts, 2 links en 2 onder de grid uitgebreid
     TetrisBlock Block;
+    public bool GoDownAllowed;
+    int Score = 0;
+    private int level = 1;
+    private double FallingSpeed = 1;
 
     /// <summary>
     /// Creates a new TetrisGrid.
@@ -24,9 +29,6 @@ class TetrisGrid
     public TetrisGrid()
     {
         Clear();
-        grid[8, 6] = Color.Green; //Dit is alleen om te testen en moet later verwijderd worden.
-        grid[8, 7] = Color.White; //Dit is alleen om te testen en moet later verwijderd worden.
-        grid[8, 8] = Color.Gray; //Dit is alleen om te testen en moet later verwijderd worden.
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
         Block = new Ipiece(this);
     }
@@ -38,7 +40,7 @@ class TetrisGrid
     }
 
     //HandleInput methode voor de TetrisGrid.
-    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys Test)
+    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys Test, Keys GoDown)
     {
         int moveLegit = 0;
         if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0) //Zorgt voor de input en een interval zodat de shape niet te snel beweegt
@@ -120,6 +122,10 @@ class TetrisGrid
                 }
             }
         }
+        if (inputHelper.KeyDown(GoDown))
+            GoDownAllowed = true;
+        else
+            GoDownAllowed = false;
 
         if (inputHelper.KeyPressed(Test)) //Dit is alleen om te testen en moet later verwijderd worden.
             Clear(); //Dit is alleen om te testen en moet later verwijderd worden.
@@ -146,6 +152,8 @@ class TetrisGrid
         }
 
         Block.Draw(gameTime, spriteBatch);
+        spriteBatch.DrawString(GameWorld.font, "Score : " + Score.ToString(), new Vector2(600, 100), Color.Blue);
+        spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(600, 120), Color.Blue);
     }
 
     public void NewBlock()
@@ -175,6 +183,43 @@ class TetrisGrid
                 break;
         }
     }
+
+    public void CheckRows()
+    {
+        int Multiplier = 1;
+        for (int i = 0; i < Height; i++)
+        {
+            bool RowIsFull = true;
+            for (int f = 2; f < Width + 2; f++)
+            {
+                if (grid[f, i] == Color.White)
+                    RowIsFull = false;
+            }
+            if (RowIsFull)
+            {
+                for (int k = 2; k < Width + 2; k++) 
+                {
+                    for (int l = i; l > 0; l--)
+                    {
+                        grid[k, l] = grid[k, l - 1];
+                    }
+                }
+                Score = Score + 10*Multiplier;
+                Multiplier += Multiplier;
+                if (Score / 100 != level - 1)
+                {
+                    FallingSpeed *= 1.2;
+                    level++;
+                }
+            }
+        }
+    }
+
+    public double fallingSpeed
+    {
+        get { return FallingSpeed; }
+    }
+
     /// <summary>
     /// Clears the grid.
     /// </summary>

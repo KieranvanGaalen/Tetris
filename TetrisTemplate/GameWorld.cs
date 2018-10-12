@@ -9,7 +9,6 @@ using System;
 /// </summary>
 class GameWorld
 {
-    static public int Level = 1;
     /// <summary>
     /// An enum for the different game states that the game can have.
     /// </summary>
@@ -27,7 +26,7 @@ class GameWorld
     /// <summary>
     /// The main font of the game.
     /// </summary>
-    SpriteFont font;
+    public static SpriteFont font;
 
     /// <summary>
     /// The current game state.
@@ -51,7 +50,7 @@ class GameWorld
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
     {
-        grid.HandleInput(gameTime, inputHelper, Keys.A, Keys.D, Keys.W, Keys.S, Keys.T);
+        grid.HandleInput(gameTime, inputHelper, Keys.A, Keys.D, Keys.E, Keys.Q, Keys.T, Keys.S);
     }
 
     public void Update(GameTime gameTime)

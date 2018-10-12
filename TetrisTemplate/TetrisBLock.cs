@@ -49,6 +49,7 @@ class TetrisBlock
                     parent.grid[(int)BlockPosition.X + i, (int)BlockPosition.Y + f] = color;
             }
         }
+        parent.CheckRows();
         parent.NewBlock();
         //Hier nog iets van code dat er voorzorgt dat het blok vast staat in de grid.
         //Checken of er een lijn gevuld is en punten geven. (Misschien aparte methode voor maken.)
@@ -57,12 +58,21 @@ class TetrisBlock
     //Update methode voor het bewegende blok.
     public void Update(GameTime gameTime)
     {
-        if (gameTime.TotalGameTime.Ticks % (60 / GameWorld.Level) == 0)
+        if (gameTime.TotalGameTime.Ticks % (int)(60.0 / parent.fallingSpeed) == 0)
         {
             if (IsBlockBelow())
                 PlaceBlock();
-            else
+            if (parent.GoDownAllowed != true)
                 BlockPosition.Y += 1;
+        }
+        if (parent.GoDownAllowed == true)
+        {
+            if (gameTime.TotalGameTime.Ticks % 6 == 0)
+            {
+                if (IsBlockBelow())
+                    PlaceBlock();
+                    BlockPosition.Y += 1;
+            }
         }
     }
 
