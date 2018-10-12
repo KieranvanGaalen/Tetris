@@ -14,7 +14,7 @@ class TetrisGrid
     public int Width { get { return 12; } } // The number of grid elements in the x-direction.
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     Random random = new Random();
-    public Color[,] grid = new Color[16, 22];
+    public Color[,] grid = new Color[16, 22]; //De grid is groter dan wat getekend wordt want anders valt de blockgrid buiten de array, de array wordt 2 rechts, 2 links en 2 onder de grid uitgebreid
     TetrisBlock Block;
 
     /// <summary>
@@ -24,9 +24,9 @@ class TetrisGrid
     public TetrisGrid()
     {
         Clear();
-        //grid[8, 6] = Color.Green; //Dit is alleen om te testen en moet later verwijderd worden.
-        //grid[8, 7] = Color.White; //Dit is alleen om te testen en moet later verwijderd worden.
-        //grid[8, 8] = Color.Gray; //Dit is alleen om te testen en moet later verwijderd worden.
+        grid[8, 6] = Color.Green; //Dit is alleen om te testen en moet later verwijderd worden.
+        grid[8, 7] = Color.White; //Dit is alleen om te testen en moet later verwijderd worden.
+        grid[8, 8] = Color.Gray; //Dit is alleen om te testen en moet later verwijderd worden.
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
         Block = new Ipiece(this);
     }
@@ -40,22 +40,22 @@ class TetrisGrid
     //HandleInput methode voor de TetrisGrid.
     public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys Test)
     {
-        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
+        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0) //Zorgt voor de input en een interval zodat de shape niet te snel beweegt
         {
-            for (int i = Block.BlockGrid.GetLength(0) - 1; i >= 0; i--)
+            for (int i = Block.BlockGrid.GetLength(0) - 1; i >= 0; i--) //Gaat vanaf rechts het eerste ingekleurde blokje zoeken
             {
                 for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
                 {
-                    if (Block.BlockGrid[i, f])
+                    if (Block.BlockGrid[i, f]) //Als het eerste ingekleurde blokje rechts gevonden is
                     {
-                        if (grid[(int)Block.BlockPosition.X + i + 1, (int)Block.BlockPosition.Y + f] == Color.White)
-                        {
+                        if (grid[(int)Block.BlockPosition.X + i + 1, (int)Block.BlockPosition.Y + f] == Color.White) //Checkt of rechts van het blokje wit is
+                        {                                                                                            
                             Block.BlockPosition.X++;
                             return;
                         }
                         else
                         {
-                            return;
+                            return; //Als rechts niet wit is moet het wel een null zijn, want het meest rechter blokje kan wordt gekozen, en dan mag de beweging dus niet gebeuren
                         }
                     }
                 }
@@ -104,7 +104,7 @@ class TetrisGrid
         {
             for (int f = 0; f < Height; f++)
             {
-                spriteBatch.Draw(emptyCell, position, grid[i + 2, f]);
+                spriteBatch.Draw(emptyCell, position, grid[i + 2, f]); //Omdat de array groter is dan de daadwerkelijke grid moet de grid opgeschoven worden door waar getekend wordt naar rechts te schuiven
                 position.Y += 30;
             }
             position.Y = 0;

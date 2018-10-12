@@ -16,7 +16,7 @@ class TetrisBlock
        3 false true false false
         Het middelpunt voor o.a. rotatie word 1,1 (de tweede true van boven) */
     public bool[,] BlockGrid = new bool[3, 3];
-    public Vector2 BlockPosition = new Vector2(6, 0);
+    public Vector2 BlockPosition = new Vector2(6, 0); //Omdat de array groter is dan de grid moet ook het block 2 naar rechts beginnen
     public Color color;
     public TetrisGrid parent; //Wordt gebruikt om variablen van de grid beschikbaar te maken voor de vallende blokken.
 
@@ -72,7 +72,7 @@ class TetrisBlock
         Vector2 position = TetrisGrid.BeginPosition;
         //Zet de cordinaten van de linkerbovenhoek van de grid van het vallende blok erin.
         position.Y += 30 * BlockPosition.Y;
-        position.X += 30 * BlockPosition.X - 60;
+        position.X += 30 * BlockPosition.X - 60; //Correctie voor de verschuiving van de grid
         //Tekent het vallende blok.
         for (int i = 0; i < BlockGrid.GetLength(0); i++)
         {
