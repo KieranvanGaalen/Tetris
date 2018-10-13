@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// A class for representing the Tetris playing grid.
+/// A class for representing a Tetris playing grid.
 /// </summary>
 class TetrisGrid
 {
@@ -16,17 +16,16 @@ class TetrisGrid
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     Random random = new Random();
     public Color[,] grid = new Color[16, 22]; //De grid is groter dan wat getekend wordt want anders valt de blockgrid buiten de array. De array wordt 2 rechts, 2 links en 2 onder de grid uitgebreid
-    TetrisBlock Block;
-    public bool GoDownAllowed;
-    int Score = 0;
-    private int level = 1;
-    public double fallingSpeed { get; private set; } = 1;
+    TetrisBlock Block; //The block that is currently active gets stored here.
+    public bool ForceBlockDownwards; //A boolian used for indicating that a block is being forced down.
+    private int Score = 0; //An interger used to keep track of the players score.
+    private int level = 1; //An interger used to keep track of the players level.
+    public double fallingSpeed { get; private set; } = 1; //The current falling speed of the Block.
     private TetrisBlock NextBlock;
 
     /// <summary>
     /// Creates a new TetrisGrid.
     /// </summary>
-    /// <param name="b"></param>
     public TetrisGrid()
     {
         Clear();
@@ -35,104 +34,61 @@ class TetrisGrid
         NewBlock();
     }
 
-    //Update methode voor de TetrisGrid.
+    /// <summary>
+    /// Update method for the TetrisGrid.
+    /// </summary>
+    /// <param name="gameTime">An object with information about the time that has passed in the game.</param>
     public void Update(GameTime gameTime)
     {
         Block.Update(gameTime);
     }
 
     //HandleInput methode voor de TetrisGrid.
+    /// <summary>
+    /// Handles the player input.
+    /// </summary>
+    /// <param name="gameTime">An object with information about the time that has passed in the game.</param>
+    /// <param name="spriteBatch">The SpriteBatch used for drawing sprites and text.</param>
+    /// <param name="LeftMove">When this key is pressed the currently active block is (if possable) moved 1 block to the left in the grid.</param>
+    /// <param name="RightMove">When this key is pressed the currently active block is (if possable) moved 1 block to the right in the grid.</param>
+    /// <param name="RotateCW">When this key is pressed the currently active block is (if possable) rotated 90 degrees Clockwise.</param>
+    /// <param name="RotateCCW">When this key is pressed the currently active block is (if possable) rotated 90 degrees CounterClockwise.</param>
+    /// <param name="GoDown">While this key is pressed the currently active block will move down through the grid at an accelerated speed.</param>
     public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys Test, Keys GoDown)
     {
-        int moveLegit = 0;
-        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0) //Zorgt voor de input en een interval zodat de shape niet te snel beweegt
+        //This part makes sure that the player can move the block to the left and right.
+        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0) //Zorgt voor een interval zodat de shape niet te snel beweegt
         {
-            for (int i = Block.BlockGrid.GetLength(0) - 1; i >= 0; i--) //Gaat vanaf rechts het eerste ingekleurde blokje zoeken
-            {
-                for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
-                {
-                    if (Block.BlockGrid[i, f]) //Als het eerste ingekleurde blokje rechts gevonden is
-                    {
-                        if (grid[(int)Block.BlockPosition.X + i + 1, (int)Block.BlockPosition.Y + f] == Color.White)
-                        {
-                            moveLegit++;
-                        }
-                    }
-                }
-            }
-            if (moveLegit == 4)
-            {
-                Block.BlockPosition.X++;
-                moveLegit = 0;
-            }
+            Block.MoveRight();
         }
         else if (inputHelper.KeyDown(LeftMove) && gameTime.TotalGameTime.Ticks % 6 == 0)
         {
-            for (int i = 0; i < Block.BlockGrid.GetLength(0); i++)
-            {
-                for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
-                {
-                    if (Block.BlockGrid[i, f])
-                    {
-                        if (grid[(int)Block.BlockPosition.X + i - 1, (int)Block.BlockPosition.Y + f] == Color.White)
-                        {
-                            moveLegit++;
-                        }
-                    }
-                }
-            }
-            if (moveLegit == 4)
-            {
-                Block.BlockPosition.X--;
-                moveLegit = 0;
-            }
+            Block.MoveLeft();
         }
 
+        //The next part is about rotating the blocks.
         if (inputHelper.KeyPressed(RotateCCW))
         {
-            Block.BlockGrid = TetrisBlock.RotateCounterClockwise(Block.BlockGrid);
-            for (int i = 0; i < Block.BlockGrid.GetLength(0); i++)
-            {
-                for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
-                {
-                    if (Block.BlockGrid[i, f])
-                    {
-                        if (grid[(int)Block.BlockPosition.X + i, (int)Block.BlockPosition.Y + f] != Color.White)
-                        {
-                            Block.BlockGrid = TetrisBlock.RotateClockwise(Block.BlockGrid);
-                            return;
-                        }
-                    }
-                }
-            }
+            TetrisBlock.RotateCounterClockwiseLegit(Block);
         }
         else if (inputHelper.KeyPressed(RotateCW))
         {
-            Block.BlockGrid = TetrisBlock.RotateClockwise(Block.BlockGrid);
-            for (int i = 0; i < Block.BlockGrid.GetLength(0); i++)
-            {
-                for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
-                {
-                    if (Block.BlockGrid[i, f])
-                    {
-                        if (grid[(int)Block.BlockPosition.X + i, (int)Block.BlockPosition.Y + f] != Color.White)
-                        {
-                            Block.BlockGrid = TetrisBlock.RotateCounterClockwise(Block.BlockGrid);
-                            return;
-                        }
-                    }
-                }
-            }
+            TetrisBlock.RotateClockwiseLegit(Block);
         }
-        if (inputHelper.KeyDown(GoDown))
-            GoDownAllowed = true;
+
+        //The following part allows the player to move the block down faster.
+        if (inputHelper.KeyDown(GoDown) && gameTime.TotalGameTime.Ticks % 6 == 0)
+        {
+            Block.MoveDown();
+            ForceBlockDownwards = true;
+        }
         else
-            GoDownAllowed = false;
+            ForceBlockDownwards = false;
 
         if (inputHelper.KeyPressed(Test)) //Dit is alleen om te testen en moet later verwijderd worden.
             Clear(); //Dit is alleen om te testen en moet later verwijderd worden.
     }
-
+    
     /// <summary>
     /// Draws the grid on the screen.
     /// </summary>
@@ -160,6 +116,9 @@ class TetrisGrid
         spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(380 + BeginPosition.X, 175 + BeginPosition.Y), Color.Blue);
     }
 
+    /// <summary>
+    /// Makes the next block the currently active block and creates a new random block to put in the position for the next block.
+    /// </summary>
     public void NewBlock()
     {
         Block = NextBlock;
@@ -190,6 +149,9 @@ class TetrisGrid
         Block.BlockPosition = new Vector2(6, 0); //Dit is de positie waar een blok dat nieuw de grid binnenkomt moet beginnen.
     }
 
+    /// <summary>
+    /// Checks weither there are any rows filled with blocks. If a row is filled, it removes that row, awards the player with points and moves all rows above one row down.
+    /// </summary>
     public void CheckRows()
     {
         int Multiplier = 1;

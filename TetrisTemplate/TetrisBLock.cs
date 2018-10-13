@@ -13,18 +13,24 @@ class TetrisBlock
        0 false true false false
        1 false true false false
        2 false true false false
-       3 false true false false
-        Het middelpunt voor o.a. rotatie word 1,1 (de tweede true van boven) */
+       3 false true false false  */
     public bool[,] BlockGrid = new bool[3, 3];
     public Vector2 BlockPosition = new Vector2(15, 1); //Als een nieuw blok gemaakt wordt komt hij eerst op de plek voor het volgende blok te staan
-    public Color color;
+    public Color color; //De kleur van het huidige blok
     public TetrisGrid parent; //Wordt gebruikt om variablen van de grid beschikbaar te maken voor de vallende blokken.
 
+    /// <summary>
+    /// The constructor method for a TetrisBlock object.
+    /// </summary>
+    /// <param name="parent">A variable used to set a reference to the parent object.</param>
     public TetrisBlock(TetrisGrid parent)
     {
         this.parent = parent;
     }
-
+    
+    /// <summary>
+    /// Checks whether the block can move 1 position down or not. Returns either true or false.
+    /// </summary>
     public bool IsBlockBelow()
     {
         for (int i = 0; i < BlockGrid.GetLength(0); i++)
@@ -35,10 +41,12 @@ class TetrisBlock
                     return true;
             }
         }
-        //Kijken of het bewegende blok nog 1 naar beneden kan. Zoniet dan zit er een blok onder.
         return false;
     }
 
+    /// <summary>
+    /// Places a block in the grid. Also executes the CheckRows and NewBlock methods in the parent object.
+    /// </summary>
     private void PlaceBlock()
     {
         for (int i = 0; i < BlockGrid.GetLength(0); i++)
@@ -51,32 +59,23 @@ class TetrisBlock
         }
         parent.CheckRows();
         parent.NewBlock();
-        //Hier nog iets van code dat er voorzorgt dat het blok vast staat in de grid.
-        //Checken of er een lijn gevuld is en punten geven. (Misschien aparte methode voor maken.)
     }
 
-    //Update methode voor het bewegende blok.
+    /// <summary>
+    /// Update method for a Tetrisblock.
+    /// </summary>
+    /// <param name="gameTime">An object with information about the time that has passed in the game.</param>
     public void Update(GameTime gameTime)
     {
-        if (gameTime.TotalGameTime.Ticks % (int)(60.0 / parent.fallingSpeed) == 0)
-        {
-            if (IsBlockBelow())
-                PlaceBlock();
-            if (parent.GoDownAllowed != true)
-                BlockPosition.Y += 1;
-        }
-        if (parent.GoDownAllowed == true)
-        {
-            if (gameTime.TotalGameTime.Ticks % 6 == 0)
-            {
-                if (IsBlockBelow())
-                    PlaceBlock();
-                    BlockPosition.Y += 1;
-            }
-        }
+        if (gameTime.TotalGameTime.Ticks % (int)(60.0 / parent.fallingSpeed) == 0 && parent.ForceBlockDownwards == false)
+            MoveDown();
     }
 
-    //Tekent het bewegende blok
+    /// <summary>
+    /// Drawing method for a TetrisBlock.
+    /// </summary>
+    /// <param name="gameTime">An object with information about the time that has passed in the game.</param>
+    /// <param name="spriteBatch">The SpriteBatch used for drawing sprites and text.</param>
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         Vector2 position = TetrisGrid.BeginPosition;
@@ -99,8 +98,65 @@ class TetrisBlock
         }
     }
 
-    //Roteert een blok tegen de klok in.
-    public static bool[,] RotateCounterClockwise(bool[,] oldBlock)
+    /// <summary>
+    /// Moves the block 1 position down. If there is a block below, it calls the PlaceBlock() method to place the block in the grid.
+    /// </summary>
+    public void MoveDown()
+    {
+        if (IsBlockBelow())
+            PlaceBlock();
+        BlockPosition.Y += 1;
+    }
+
+    /// <summary>
+    /// Checks if the block can move to the left and then moves the block 1 position to the left (if possable). 
+    /// </summary>
+    public void MoveLeft()
+    {
+        bool moveLegit = true;
+        for (int i = 0; i < BlockGrid.GetLength(0); i++)
+        {
+            for (int f = 0; f < BlockGrid.GetLength(1); f++)
+            {
+                if (BlockGrid[i, f])
+                {
+                    if (parent.grid[(int)BlockPosition.X + i - 1, (int)BlockPosition.Y + f] != Color.White)
+                    {
+                        moveLegit = false;
+                    }
+                }
+            }
+        }
+        if (moveLegit)
+            BlockPosition.X--;
+    }
+
+    /// <summary>
+    /// Checks if the block can move to the right and then moves the block 1 position to the right (if possable). 
+    /// </summary>
+    public void MoveRight()
+    {
+        bool moveLegit = true;
+        for (int i = BlockGrid.GetLength(0) - 1; i >= 0; i--) //Gaat vanaf rechts het eerste ingekleurde blokje zoeken
+        {
+            for (int f = 0; f < BlockGrid.GetLength(1); f++)
+            {
+                if (BlockGrid[i, f]) //Als het eerste ingekleurde blokje rechts gevonden is
+                {
+                    if (parent.grid[(int)BlockPosition.X + i + 1, (int)BlockPosition.Y + f] != Color.White)
+                        moveLegit = false;
+                }
+            }
+        }
+        if (moveLegit)
+            BlockPosition.X++;
+    }
+
+    /// <summary>
+    /// Returns a version of the block that is rotated 90 degrees CounterClockwise. This method does NOT check weither this is alowed or not.
+    /// </summary>
+    /// <param name="oldBlock">The block that you want to rotate.</param>
+    protected static bool[,] RotateCounterClockwise(bool[,] oldBlock)
     {
         bool[,] newBlock = new bool[oldBlock.GetLength(1), oldBlock.GetLength(0)];
         int oldColumn = 0, oldRow;
@@ -117,8 +173,11 @@ class TetrisBlock
         return newBlock;
     }
 
-    //Roteert een blok met de klok mee.
-    public static bool[,] RotateClockwise(bool[,] oldBlock)
+    /// <summary>
+    /// Returns a version of the block that is rotated 90 degrees Clockwise. This method does NOT check weither this is alowed or not.
+    /// </summary>
+    /// <param name="oldBlock">The block that you want to rotate.</param>
+    protected static bool[,] RotateClockwise(bool[,] oldBlock)
     {
         bool[,] newBlock = new bool[oldBlock.GetLength(1), oldBlock.GetLength(0)];
         int newColumn, newRow = 0;
@@ -133,6 +192,46 @@ class TetrisBlock
             newRow++;
         }
         return newBlock;
+    }
+
+    /// <summary>
+    /// Check if the block is allowed to rotate 90 degrees CounterClockwise, and then rotates it (only if that is allowed).
+    /// </summary>
+    /// <param name="Block">The block that you want to rotate.</param>
+    public static void RotateCounterClockwiseLegit(TetrisBlock Block)
+    {
+        Block.BlockGrid = RotateCounterClockwise(Block.BlockGrid);
+        for (int i = 0; i < Block.BlockGrid.GetLength(0); i++)
+        {
+            for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
+            {
+                if (Block.BlockGrid[i, f] && Block.parent.grid[(int)Block.BlockPosition.X + i, (int)Block.BlockPosition.Y + f] != Color.White)
+                {
+                    Block.BlockGrid = RotateClockwise(Block.BlockGrid);
+                    return;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Check if the block is allowed to rotate 90 degrees Clockwise, and then rotates it (only if that is allowed).
+    /// </summary>
+    /// <param name="Block">The block that you want to rotate.</param>
+    public static void RotateClockwiseLegit(TetrisBlock Block)
+    {
+        Block.BlockGrid = RotateClockwise(Block.BlockGrid);
+        for (int i = 0; i < Block.BlockGrid.GetLength(0); i++)
+        {
+            for (int f = 0; f < Block.BlockGrid.GetLength(1); f++)
+            {
+                if (Block.BlockGrid[i, f] && Block.parent.grid[(int)Block.BlockPosition.X + i, (int)Block.BlockPosition.Y + f] != Color.White)
+                {
+                    Block.BlockGrid = RotateCounterClockwise(Block.BlockGrid);
+                    return;
+                }
+            }
+        }
     }
 
 }
