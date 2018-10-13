@@ -15,12 +15,13 @@ class TetrisGrid
     public int Width { get { return 12; } } // The number of grid elements in the x-direction.
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     Random random = new Random();
-    public Color[,] grid = new Color[16, 22]; //De grid is groter dan wat getekend wordt want anders valt de blockgrid buiten de array, de array wordt 2 rechts, 2 links en 2 onder de grid uitgebreid
+    public Color[,] grid = new Color[16, 22]; //De grid is groter dan wat getekend wordt want anders valt de blockgrid buiten de array. De array wordt 2 rechts, 2 links en 2 onder de grid uitgebreid
     TetrisBlock Block;
     public bool GoDownAllowed;
     int Score = 0;
     private int level = 1;
-    private double FallingSpeed = 1;
+    public double fallingSpeed { get; private set; } = 1;
+    private TetrisBlock NextBlock;
 
     /// <summary>
     /// Creates a new TetrisGrid.
@@ -30,7 +31,8 @@ class TetrisGrid
     {
         Clear();
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
-        Block = new Ipiece(this);
+        NextBlock = new Ipiece(this);
+        NewBlock();
     }
 
     //Update methode voor de TetrisGrid.
@@ -152,36 +154,40 @@ class TetrisGrid
         }
 
         Block.Draw(gameTime, spriteBatch);
-        spriteBatch.DrawString(GameWorld.font, "Score : " + Score.ToString(), new Vector2(600, 100), Color.Blue);
-        spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(600, 120), Color.Blue);
+        NextBlock.Draw(gameTime, spriteBatch);
+        spriteBatch.DrawString(GameWorld.font, "Next Block : ", new Vector2(380 + BeginPosition.X, 5 + BeginPosition.Y), Color.Blue);
+        spriteBatch.DrawString(GameWorld.font, "Score : " + Score.ToString(), new Vector2(380 + BeginPosition.X, 155 + BeginPosition.Y), Color.Blue);
+        spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(380 + BeginPosition.X, 175 + BeginPosition.Y), Color.Blue);
     }
 
     public void NewBlock()
     {
+        Block = NextBlock;
         switch (GameWorld.Random.Next(7))
         {
             case 0:
-                Block = new Opiece(this);
+                NextBlock = new Opiece(this);
                 break;
             case 1:
-                Block = new Ipiece(this);
+                NextBlock = new Ipiece(this);
                 break;
             case 2:
-                Block = new Lpiece(this);
+                NextBlock = new Lpiece(this);
                 break;
             case 3:
-                Block = new Jpiece(this);
+                NextBlock = new Jpiece(this);
                 break;
             case 4:
-                Block = new Spiece(this);
+                NextBlock = new Spiece(this);
                 break;
             case 5:
-                Block = new Zpiece(this);
+                NextBlock = new Zpiece(this);
                 break;
             case 6:
-                Block = new Tpiece(this);
+                NextBlock = new Tpiece(this);
                 break;
         }
+        Block.BlockPosition = new Vector2(6, 0); //Dit is de positie waar een blok dat nieuw de grid binnenkomt moet beginnen.
     }
 
     public void CheckRows()
@@ -208,16 +214,11 @@ class TetrisGrid
                 Multiplier += Multiplier;
                 if (Score / 100 != level - 1)
                 {
-                    FallingSpeed *= 1.2;
+                    fallingSpeed *= 1.2;
                     level++;
                 }
             }
         }
-    }
-
-    public double fallingSpeed
-    {
-        get { return FallingSpeed; }
     }
 
     /// <summary>
