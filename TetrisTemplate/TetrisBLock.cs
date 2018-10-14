@@ -58,6 +58,8 @@ class TetrisBlock
             }
         }
         parent.CheckRows();
+        if (BlockPosition == new Vector2(6, 0))
+            parent.IsDead = true;
         parent.NewBlock();
     }
 
@@ -78,7 +80,7 @@ class TetrisBlock
     /// <param name="spriteBatch">The SpriteBatch used for drawing sprites and text.</param>
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-        Vector2 position = TetrisGrid.BeginPosition;
+        Vector2 position = parent.BeginPosition;
         //Zet de cordinaten van de linkerbovenhoek van de grid van het vallende blok erin.
         position.Y += 30 * BlockPosition.Y;
         position.X += 30 * BlockPosition.X - 60; //Correctie voor de verschuiving van de grid
@@ -241,6 +243,7 @@ class Opiece : TetrisBlock
     public Opiece(TetrisGrid parent) : base(parent)
     {
         color = Color.Yellow;
+        BlockPosition = new Vector2(14, 0);
         BlockGrid = new bool[4, 4];
         BlockGrid[1, 1] = true;
         BlockGrid[1, 2] = true;

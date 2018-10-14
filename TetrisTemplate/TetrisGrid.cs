@@ -11,15 +11,16 @@ using System.Collections.Generic;
 class TetrisGrid
 {
     public static Texture2D emptyCell; // The sprite of a single empty cell in the grid.
-    public static Vector2 BeginPosition = new Vector2(220, 0);// The position at which this TetrisGrid should be drawn. Also used to draw the collored blocks.
+    public Vector2 BeginPosition = new Vector2(220, 0);// The position at which this TetrisGrid should be drawn. Also used to draw the collored blocks.
     public int Width { get { return 12; } } // The number of grid elements in the x-direction.
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     Random random = new Random();
     public Color[,] grid = new Color[16, 22]; //De grid is groter dan wat getekend wordt want anders valt de blockgrid buiten de array. De array wordt 2 rechts, 2 links en 2 onder de grid uitgebreid
     TetrisBlock Block; //The block that is currently active gets stored here.
     public bool ForceBlockDownwards; //A boolian used for indicating that a block is being forced down.
-    private int Score = 0; //An interger used to keep track of the players score.
+    public int Score { get; private set; } = 0; //An interger used to keep track of the players score.
     private int level = 1; //An interger used to keep track of the players level.
+    public bool IsDead = false; //When the blocks can no longer fall down this will be set to true and the game will be over.
     public double fallingSpeed { get; private set; } = 1; //The current falling speed of the Block.
     private TetrisBlock NextBlock;
 
@@ -112,8 +113,8 @@ class TetrisGrid
         Block.Draw(gameTime, spriteBatch);
         NextBlock.Draw(gameTime, spriteBatch);
         spriteBatch.DrawString(GameWorld.font, "Next Block : ", new Vector2(380 + BeginPosition.X, 5 + BeginPosition.Y), Color.Blue);
-        spriteBatch.DrawString(GameWorld.font, "Score : " + Score.ToString(), new Vector2(380 + BeginPosition.X, 155 + BeginPosition.Y), Color.Blue);
-        spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(380 + BeginPosition.X, 175 + BeginPosition.Y), Color.Blue);
+        spriteBatch.DrawString(GameWorld.font, "Score : " + Score.ToString(), new Vector2(380 + BeginPosition.X, 155 + BeginPosition.Y), Color.Blue); //Tekent de Score van de speler.
+        spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(380 + BeginPosition.X, 175 + BeginPosition.Y), Color.Blue); //Tekent welk level de speler momenteel in zit.
     }
 
     /// <summary>
@@ -184,9 +185,9 @@ class TetrisGrid
     }
 
     /// <summary>
-    /// Clears the grid.
+    /// Clears the grid.                                Als we deze later niet meer gebruiken -> voeg samen met reset()
     /// </summary>
-    public void Clear()
+    public void Clear() 
     {
         Vector2 position = BeginPosition;
         for (int i = 2; i < Width + 2; i++)
@@ -200,5 +201,20 @@ class TetrisGrid
             position.X += 30;
         }
     }
-    
+
+    /// <summary>
+    /// Resets the grid.
+    /// </summary>
+    public void Reset()
+    {
+        Clear();
+        NewBlock();
+        NewBlock();
+        Score = 0;
+        level = 1;
+        fallingSpeed = 1;
+        BeginPosition = new Vector2(220, 0);
+        IsDead = false;
+    }
+
 }
