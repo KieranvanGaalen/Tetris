@@ -16,7 +16,8 @@ class GameWorld
     {
         StartScreen,
         PlayingSinglePlayer,
-        PlayingVS,
+        PlayingVSMode,
+        HighScoreMode,
         GameOverSinglePlayer,
         Player1Wins,
         Player2Wins,
@@ -80,9 +81,21 @@ class GameWorld
                     gameState = GameState.PlayingSinglePlayer;
                     grid1.Reset();
                 }
+                else if (inputHelper.KeyPressed(Keys.Enter))
+                {
+                    gameState = GameState.HighScoreMode;
+                    grid1.Reset();
+                    if (grid2 == null)
+                        grid2 = new TetrisGrid();
+                    else
+                        grid2.Reset();
+                    grid1.BeginPosition = new Vector2(000, 0);
+                    grid2.BeginPosition = new Vector2(510, 0);
+                    parent.SetScreenSize(1020, 600);
+                }
                 else if (inputHelper.KeyPressed(Keys.LeftShift))
                 {
-                    gameState = GameState.PlayingVS;
+                    gameState = GameState.PlayingVSMode;
                     grid1.Reset();
                     if (grid2 == null)
                         grid2 = new TetrisGrid();
@@ -93,7 +106,8 @@ class GameWorld
                     parent.SetScreenSize(1020, 600);
                 }
                 break;
-            case GameState.PlayingVS:
+            case GameState.PlayingVSMode:
+            case GameState.HighScoreMode:
                 if(!grid2.IsDead)
                     grid2.HandleInput(gameTime, inputHelper, Keys.J, Keys.L, Keys.O, Keys.U, Keys.I, Keys.K);
                 goto case GameState.PlayingSinglePlayer;
@@ -108,7 +122,15 @@ class GameWorld
     {
         switch(gameState)
         {
-            case GameState.PlayingVS:
+            case GameState.PlayingVSMode:
+                if (!grid2.IsDead)
+                    grid2.Update(gameTime);
+                else
+                    gameState = GameState.Player1Wins;
+                if (grid1.IsDead)
+                    gameState = GameState.Player2Wins;
+                goto case GameState.PlayingSinglePlayer;
+            case GameState.HighScoreMode:
                 if (!grid2.IsDead)
                     grid2.Update(gameTime);
                 else if (grid2.IsDead && grid1.IsDead)
@@ -138,7 +160,8 @@ class GameWorld
             case GameState.StartScreen:
                 spriteBatch.Draw(StartScreen, new Vector2(-30, 0), Color.White);
                 break;
-            case GameState.PlayingVS:
+            case GameState.PlayingVSMode:
+            case GameState.HighScoreMode:
                 grid2.Draw(gameTime, spriteBatch);
                 goto case GameState.PlayingSinglePlayer;
             case GameState.PlayingSinglePlayer:
