@@ -11,18 +11,19 @@ using System.Collections.Generic;
 class TetrisGrid
 {
     public static Texture2D emptyCell ; // The sprite of a single empty cell in the grid.
-    public Vector2 BeginPosition = new Vector2(250, 0);// The position at which this TetrisGrid should be drawn. Also used to draw the collored blocks.
+    public Vector2 BeginPosition = new Vector2(0, 0);// The position at which this TetrisGrid should be drawn. Also used to draw the collored blocks.
     public int Width { get { return 10; } } // The number of grid elements in the x-direction.
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
     readonly Random random = new Random(); //Random used for creating the new blocks
     public Color[,] grid = new Color[14, 22]; //The grid is larger than is drawn, it is 2 larger to the left, right and bottom, this is later corrected
-    TetrisBlock Block; //The block that is currently active gets stored here.
+    private TetrisBlock Block; //The block that is currently active gets stored here.
     public bool ForceBlockDownwards; //A boolian used for indicating that a block is being forced down.
-    public int Score { get; private set; } = 0; //An integer used to keep track of the players score.
+    private int TotalScore = 0; //An integer used to keep track of the players total score.
+    public int Score = 0; //An integer used to keep track of the players score.
     private int level = 1; //An interger used to keep track of the players level.
     public bool IsDead = false; //When the blocks can no longer fall down this will be set to true and the game will be over.
     public double FallingSpeed { get; private set; } = 1; //The current falling speed of the Block.
-    private TetrisBlock NextBlock;
+    public TetrisBlock NextBlock;
     private GhostBlock GhostBlock;
 
     /// <summary>
@@ -115,9 +116,9 @@ class TetrisGrid
         GhostBlock.Draw(gameTime, spriteBatch);
         Block.Draw(gameTime, spriteBatch);
         NextBlock.Draw(gameTime, spriteBatch);
-        spriteBatch.DrawString(GameWorld.font, "Next Block : ", new Vector2(350 + BeginPosition.X, 5 + BeginPosition.Y), Color.Blue);
-        spriteBatch.DrawString(GameWorld.font, "Score : " + Score.ToString(), new Vector2(350 + BeginPosition.X, 155 + BeginPosition.Y), Color.Blue); //Draws the players score
-        spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(350 + BeginPosition.X, 175 + BeginPosition.Y), Color.Blue); //Draws the players level
+        spriteBatch.DrawString(GameWorld.font, "Next Block : ", new Vector2(320 + BeginPosition.X, 5 + BeginPosition.Y), Color.Blue);
+        spriteBatch.DrawString(GameWorld.font, "Score : " + Score.ToString(), new Vector2(320 + BeginPosition.X, 155 + BeginPosition.Y), Color.Blue); //Draws the players score
+        spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(320 + BeginPosition.X, 175 + BeginPosition.Y), Color.Blue); //Draws the players level
     }
 
     /// <summary>
@@ -177,8 +178,9 @@ class TetrisGrid
                     }
                 }
                 Score = Score + 10*Multiplier;
+                TotalScore = TotalScore + 10 * Multiplier;
                 Multiplier += Multiplier;
-                if (Score / 100 != level - 1)
+                if (TotalScore / 100 != level - 1)
                 {
                     FallingSpeed *= 1.2;
                     level++;
@@ -216,7 +218,7 @@ class TetrisGrid
         Score = 0;
         level = 1;
         FallingSpeed = 1;
-        BeginPosition = new Vector2(220, 0);
+        BeginPosition = new Vector2(0, 0);
         IsDead = false;
     }
 

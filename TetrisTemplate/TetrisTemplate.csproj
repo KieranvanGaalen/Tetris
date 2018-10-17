@@ -39,6 +39,9 @@
     </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BadBlocks.cs" />
+    <Compile Include="SpecialBlocks.cs" />
+    <Compile Include="SideBar.cs" />
     <Compile Include="TetrisBlock.cs" />
     <Compile Include="GameWorld.cs" />
     <Compile Include="InputHelper.cs" />

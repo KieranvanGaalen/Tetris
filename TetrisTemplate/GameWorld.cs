@@ -40,6 +40,8 @@ class GameWorld
     public static Texture2D Player1Wins;
     public static Texture2D Player2Wins;
     public static Texture2D Tie;
+    public static Texture2D SideBar;
+    public static Texture2D Bomb;
 
     /// <summary>
     /// The current game state.
@@ -57,6 +59,12 @@ class GameWorld
     TetrisGrid grid1;
     TetrisGrid grid2;
 
+    /// <summary>
+    /// Creates the sidebar objects.
+    /// </summary>
+    VSSideBar VSSideBarPlayer1;
+    VSSideBar VSSideBarPlayer2;
+
     public GameWorld(TetrisGame parent)
     {
         this.parent = parent;
@@ -66,7 +74,12 @@ class GameWorld
         Player1Wins = TetrisGame.ContentManager.Load<Texture2D>("GameOverPlayer1");
         Player2Wins = TetrisGame.ContentManager.Load<Texture2D>("GameOverPlayer2");
         Tie = TetrisGame.ContentManager.Load<Texture2D>("GameOverTie");
+        SideBar = TetrisGame.ContentManager.Load<Texture2D>("SideBar");
+        Bomb = TetrisGame.ContentManager.Load<Texture2D>("Bomb");
         grid1 = new TetrisGrid();
+        grid2 = new TetrisGrid();
+        VSSideBarPlayer1 = new VSSideBar(this, grid1, grid2);
+        VSSideBarPlayer2 = new VSSideBar(this, grid2, grid1);
     }
 
     public void HandleInput(GameTime gameTime, InputHelper inputHelper)
@@ -80,33 +93,29 @@ class GameWorld
                 {
                     gameState = GameState.PlayingSinglePlayer;
                     grid1.Reset();
+                    parent.SetScreenSize(480, 600);
                 }
                 else if (inputHelper.KeyPressed(Keys.Enter))
                 {
                     gameState = GameState.HighScoreMode;
                     grid1.Reset();
-                    if (grid2 == null)
-                        grid2 = new TetrisGrid();
-                    else
-                        grid2.Reset();
-                    grid1.BeginPosition = new Vector2(000, 0);
-                    grid2.BeginPosition = new Vector2(510, 0);
-                    parent.SetScreenSize(1020, 600);
+                    grid2.Reset();
+                    grid2.BeginPosition = new Vector2(480, 0);
+                    parent.SetScreenSize(960, 600);
                 }
                 else if (inputHelper.KeyPressed(Keys.LeftShift))
                 {
                     gameState = GameState.PlayingVSMode;
                     grid1.Reset();
-                    if (grid2 == null)
-                        grid2 = new TetrisGrid();
-                    else
-                        grid2.Reset();
-                    grid1.BeginPosition = new Vector2(000, 0);
-                    grid2.BeginPosition = new Vector2(510, 0);
-                    parent.SetScreenSize(1020, 600);
+                    grid2.Reset();
+                    grid2.BeginPosition = new Vector2(480, 0);
+                    parent.SetScreenSize(960, 600);
                 }
                 break;
             case GameState.PlayingVSMode:
+                VSSideBarPlayer1.HandleInput(gameTime, inputHelper, Keys.Z, Keys.X, Keys.C);
+                VSSideBarPlayer2.HandleInput(gameTime, inputHelper, Keys.M, Keys.OemComma, Keys.OemPeriod);
+                goto case GameState.HighScoreMode;
             case GameState.HighScoreMode:
                 if(!grid2.IsDead)
                     grid2.HandleInput(gameTime, inputHelper, Keys.J, Keys.L, Keys.O, Keys.U, Keys.I, Keys.K);
@@ -158,27 +167,34 @@ class GameWorld
         switch (gameState)
         {
             case GameState.StartScreen:
-                spriteBatch.Draw(StartScreen, new Vector2(-30, 0), Color.White);
+                spriteBatch.Draw(StartScreen, Vector2.Zero, Color.White);
                 break;
             case GameState.PlayingVSMode:
+                VSSideBarPlayer1.Draw(gameTime, spriteBatch, "Z", "X", "C");
+                VSSideBarPlayer2.Draw(gameTime, spriteBatch, "M", "<,", ">.");
+                grid2.Draw(gameTime, spriteBatch);
+                grid1.Draw(gameTime, spriteBatch);
+                break;
             case GameState.HighScoreMode:
+                VSSideBarPlayer2.Draw(gameTime, spriteBatch);
                 grid2.Draw(gameTime, spriteBatch);
                 goto case GameState.PlayingSinglePlayer;
             case GameState.PlayingSinglePlayer:
+                VSSideBarPlayer1.Draw(gameTime, spriteBatch);
                 grid1.Draw(gameTime, spriteBatch);
                 break;
             case GameState.GameOverSinglePlayer:
-                spriteBatch.Draw(GameOverSinglePlayer, new Vector2(-30, 0), Color.White);
+                spriteBatch.Draw(GameOverSinglePlayer, Vector2.Zero, Color.White);
                 spriteBatch.DrawString(font, "Score : " + grid1.Score.ToString(), new Vector2(TetrisGame.ScreenSize.X / 2 - 115, TetrisGame.ScreenSize.Y / 2 + 200 ),  Color.Blue, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0f);
                 break;
             case GameState.Player1Wins:
-                spriteBatch.Draw(Player1Wins, new Vector2(-30,0), Color.White);
+                spriteBatch.Draw(Player1Wins, new Vector2(-60,0), Color.White);
                 break;
             case GameState.Player2Wins:
-                spriteBatch.Draw(Player2Wins, new Vector2(-30, 0), Color.White);
+                spriteBatch.Draw(Player2Wins, new Vector2(-60, 0), Color.White);
                 break;
             case GameState.Tie:
-                spriteBatch.Draw(Tie, new Vector2(-30, 0), Color.White);
+                spriteBatch.Draw(Tie, new Vector2(-60, 0), Color.White);
                 break;
         }
         spriteBatch.End();

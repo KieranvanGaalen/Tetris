@@ -15,7 +15,7 @@ class TetrisBlock
        2 false true false false
        3 false true false false  */
     public bool[,] BlockGrid = new bool[3, 3];
-    public Vector2 BlockPosition = new Vector2(14, 1); //When a new block is created it is first placed in the next block position
+    public Vector2 BlockPosition = new Vector2(13, 1); //When a new block is created it is first placed in the next block position
     public Color color; //The color of the current block
     public TetrisGrid parent; //This is used to make all variables from the grid available to falling blocks
 
@@ -47,7 +47,7 @@ class TetrisBlock
     /// <summary>
     /// Places a block in the grid. Also executes the CheckRows and NewBlock methods in the parent object.
     /// </summary>
-    private void PlaceBlock()
+    protected virtual void PlaceBlock()
     {
         for (int i = 0; i < BlockGrid.GetLength(0); i++)
         {
@@ -78,7 +78,7 @@ class TetrisBlock
     /// </summary>
     /// <param name="gameTime">An object with information about the time that has passed in the game.</param>
     /// <param name="spriteBatch">The SpriteBatch used for drawing sprites and text.</param>
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         Vector2 position = parent.BeginPosition;
         //Sets the coordinates of the top left of the block
@@ -256,7 +256,7 @@ class Opiece : TetrisBlock
     public Opiece(TetrisGrid parent) : base(parent)
     {
         color = Color.Yellow;
-        BlockPosition = new Vector2(13, 0);
+        BlockPosition = new Vector2(12, 0);
         BlockGrid = new bool[4, 4];
         BlockGrid[1, 1] = true;
         BlockGrid[1, 2] = true;
@@ -335,41 +335,5 @@ class Tpiece : TetrisBlock
         BlockGrid[1, 0] = true;
         BlockGrid[2, 0] = true;
         BlockGrid[1, 1] = true;
-    }
-}
-
-class GhostBlock : TetrisBlock
-{
-    public GhostBlock(TetrisGrid parent) : base(parent)
-    {
-        color = Color.Gray;
-        BlockGrid = new bool[4, 4];
-        BlockGrid[1, 0] = true;
-        BlockGrid[1, 1] = true;
-        BlockGrid[1, 2] = true;
-        BlockGrid[1, 3] = true;
-    }
-    
-    public void Clone(TetrisBlock Block)
-    {
-        BlockGrid = Block.BlockGrid;
-        BlockPosition = Block.BlockPosition;
-    }
-
-    public override void SlamDown()
-    {
-        while (true)
-        {
-            if (IsBlockBelow())
-                return;
-            else
-                BlockPosition.Y += 1;
-        }
-    }
-
-    public void Update(GameTime gameTime, TetrisBlock Block)
-    {
-        Clone(Block);
-        SlamDown();
     }
 }
