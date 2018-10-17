@@ -31,10 +31,19 @@ class GameWorld
     /// </summary>
     public static SpriteFont font;
 
+    /// <summery>
+    /// Loads the sprites for the gamestates where the player is not playing.
+    /// </summery>
+    public static Texture2D StartScreen;
+    public static Texture2D GameOverSinglePlayer;
+    public static Texture2D Player1Wins;
+    public static Texture2D Player2Wins;
+    public static Texture2D Tie;
+
     /// <summary>
     /// The current game state.
     /// </summary>
-    public GameState gameState { get; private set; } = GameState.PlayingSinglePlayer;
+    public GameState gameState { get; private set; } = GameState.StartScreen;
 
     /// <summary>
     /// A reference to the parent TetrisGame object.
@@ -51,6 +60,11 @@ class GameWorld
     {
         this.parent = parent;
         font = TetrisGame.ContentManager.Load<SpriteFont>("SpelFont");
+        StartScreen = TetrisGame.ContentManager.Load<Texture2D>("StartScreen");
+        GameOverSinglePlayer = TetrisGame.ContentManager.Load<Texture2D>("GameOver1Player");
+        Player1Wins = TetrisGame.ContentManager.Load<Texture2D>("GameOverPlayer1");
+        Player2Wins = TetrisGame.ContentManager.Load<Texture2D>("GameOverPlayer2");
+        Tie = TetrisGame.ContentManager.Load<Texture2D>("GameOverTie");
         grid1 = new TetrisGrid();
     }
 
@@ -122,8 +136,7 @@ class GameWorld
         switch (gameState)
         {
             case GameState.StartScreen:
-                spriteBatch.DrawString(font, "Press Spacebar to play solo.", new Vector2(TetrisGame.ScreenSize.X / 2 - 100, TetrisGame.ScreenSize.Y / 2 - 30), Color.Blue);
-                spriteBatch.DrawString(font, "Press Shift to play VS mode.", new Vector2(TetrisGame.ScreenSize.X / 2 - 100, TetrisGame.ScreenSize.Y / 2), Color.Blue);
+                spriteBatch.Draw(StartScreen, Vector2.Zero, Color.White);
                 break;
             case GameState.PlayingVS:
                 grid2.Draw(gameTime, spriteBatch);
@@ -132,17 +145,17 @@ class GameWorld
                 grid1.Draw(gameTime, spriteBatch);
                 break;
             case GameState.GameOverSinglePlayer:
-                spriteBatch.DrawString(font, "Game over!", new Vector2(TetrisGame.ScreenSize.X / 2 - 30, TetrisGame.ScreenSize.Y / 2 - 30), Color.Blue);
-                spriteBatch.DrawString(font, "Score : " + grid1.Score.ToString(), new Vector2(TetrisGame.ScreenSize.X / 2 - 19, TetrisGame.ScreenSize.Y / 2 ), Color.Blue);
+                spriteBatch.Draw(GameOverSinglePlayer, Vector2.Zero, Color.White);
+                spriteBatch.DrawString(font, "Score : " + grid1.Score.ToString(), new Vector2(TetrisGame.ScreenSize.X / 2 - 115, TetrisGame.ScreenSize.Y / 2 + 200 ),  Color.Blue, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0f);
                 break;
             case GameState.Player1Wins:
-                spriteBatch.DrawString(font, "Player 1 Wins!!!", new Vector2(TetrisGame.ScreenSize.X / 2 - 57, TetrisGame.ScreenSize.Y / 2 - 15), Color.Blue);
+                spriteBatch.Draw(Player1Wins, Vector2.Zero, Color.White);
                 break;
             case GameState.Player2Wins:
-                spriteBatch.DrawString(font, "Player 2 Wins!!!", new Vector2(TetrisGame.ScreenSize.X / 2 - 57, TetrisGame.ScreenSize.Y / 2 - 15), Color.Blue);
+                spriteBatch.Draw(Player2Wins, Vector2.Zero, Color.White);
                 break;
             case GameState.Tie:
-                spriteBatch.DrawString(font, "It's a Tie!", new Vector2(TetrisGame.ScreenSize.X / 2 - 32, TetrisGame.ScreenSize.Y / 2 - 15), Color.Blue);
+                spriteBatch.Draw(Tie, Vector2.Zero, Color.White);
                 break;
         }
         spriteBatch.End();
