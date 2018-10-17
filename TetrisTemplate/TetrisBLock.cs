@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 class TetrisBlock
 {
-    /* De grid van de blokken zal zoals hieronder aangegeven worden
+    /* The grid for blocks is drawn as below
           0     1    2     3
        0 false true false false
        1 false true false false
        2 false true false false
        3 false true false false  */
     public bool[,] BlockGrid = new bool[3, 3];
-    public Vector2 BlockPosition = new Vector2(15, 1); //Als een nieuw blok gemaakt wordt komt hij eerst op de plek voor het volgende blok te staan
-    public Color color; //De kleur van het huidige blok
-    public TetrisGrid parent; //Wordt gebruikt om variablen van de grid beschikbaar te maken voor de vallende blokken.
+    public Vector2 BlockPosition = new Vector2(14, 1); //When a new block is created it is first placed in the next block position
+    public Color color; //The color of the current block
+    public TetrisGrid parent; //This is used to make all variables from the grid available to falling blocks
 
     /// <summary>
     /// The constructor method for a TetrisBlock object.
@@ -27,7 +27,7 @@ class TetrisBlock
     {
         this.parent = parent;
     }
-    
+
     /// <summary>
     /// Checks whether the block can move 1 position down or not. Returns either true or false.
     /// </summary>
@@ -67,9 +67,9 @@ class TetrisBlock
     /// Update method for a Tetrisblock.
     /// </summary>
     /// <param name="gameTime">An object with information about the time that has passed in the game.</param>
-    public void Update(GameTime gameTime)
+    public virtual void Update(GameTime gameTime)
     {
-        if (gameTime.TotalGameTime.Ticks % (int)(60.0 / parent.fallingSpeed) == 0 && parent.ForceBlockDownwards == false)
+        if (gameTime.TotalGameTime.Ticks % (int)(60.0 / parent.FallingSpeed) == 0 && parent.ForceBlockDownwards == false)
             MoveDown();
     }
 
@@ -81,10 +81,10 @@ class TetrisBlock
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         Vector2 position = parent.BeginPosition;
-        //Zet de cordinaten van de linkerbovenhoek van de grid van het vallende blok erin.
+        //Sets the coordinates of the top left of the block
         position.Y += 30 * BlockPosition.Y;
-        position.X += 30 * BlockPosition.X - 60; //Correctie voor de verschuiving van de grid
-        //Tekent het vallende blok.
+        position.X += 30 * BlockPosition.X - 60; //Correction of a larger grid
+        //Draws the falling block
         for (int i = 0; i < BlockGrid.GetLength(0); i++)
         {
             for (int f = 0; f < BlockGrid.GetLength(1); f++)
@@ -110,9 +110,9 @@ class TetrisBlock
         BlockPosition.Y += 1;
     }
 
-    public void SlamDown()
+    public virtual void SlamDown()
     {
-        while(true)
+        while (true)
         {
             if (IsBlockBelow())
             {
@@ -152,13 +152,13 @@ class TetrisBlock
     public void MoveRight()
     {
         bool moveLegit = true;
-        for (int i = BlockGrid.GetLength(0) - 1; i >= 0; i--) //Gaat vanaf rechts het eerste ingekleurde blokje zoeken
+        for (int i = BlockGrid.GetLength(0) - 1; i >= 0; i--) //Searches the first colored block to the right
         {
             for (int f = 0; f < BlockGrid.GetLength(1); f++)
             {
-                if (BlockGrid[i, f]) //Als het eerste ingekleurde blokje rechts gevonden is
+                if (BlockGrid[i, f]) //When the first colored block to the right is found
                 {
-                    if (parent.grid[(int)BlockPosition.X + i + 1, (int)BlockPosition.Y + f] != Color.White)
+                    if (parent.grid[(int)BlockPosition.X + i + 1, (int)BlockPosition.Y + f] != Color.White) //Check if you can move
                         moveLegit = false;
                 }
             }
@@ -256,7 +256,7 @@ class Opiece : TetrisBlock
     public Opiece(TetrisGrid parent) : base(parent)
     {
         color = Color.Yellow;
-        BlockPosition = new Vector2(14, 0);
+        BlockPosition = new Vector2(13, 0);
         BlockGrid = new bool[4, 4];
         BlockGrid[1, 1] = true;
         BlockGrid[1, 2] = true;
@@ -335,5 +335,41 @@ class Tpiece : TetrisBlock
         BlockGrid[1, 0] = true;
         BlockGrid[2, 0] = true;
         BlockGrid[1, 1] = true;
+    }
+}
+
+class GhostBlock : TetrisBlock
+{
+    public GhostBlock(TetrisGrid parent) : base(parent)
+    {
+        color = Color.Gray;
+        BlockGrid = new bool[4, 4];
+        BlockGrid[1, 0] = true;
+        BlockGrid[1, 1] = true;
+        BlockGrid[1, 2] = true;
+        BlockGrid[1, 3] = true;
+    }
+    
+    public void Clone(TetrisBlock Block)
+    {
+        BlockGrid = Block.BlockGrid;
+        BlockPosition = Block.BlockPosition;
+    }
+
+    public override void SlamDown()
+    {
+        while (true)
+        {
+            if (IsBlockBelow())
+                return;
+            else
+                BlockPosition.Y += 1;
+        }
+    }
+
+    public void Update(GameTime gameTime, TetrisBlock Block)
+    {
+        Clone(Block);
+        SlamDown();
     }
 }

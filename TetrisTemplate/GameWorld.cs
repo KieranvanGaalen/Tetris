@@ -89,8 +89,8 @@ class GameWorld
                     else
                         grid2.Reset();
                     grid1.BeginPosition = new Vector2(000, 0);
-                    grid2.BeginPosition = new Vector2(540, 0);
-                    parent.SetScreenSize(1080, 600);
+                    grid2.BeginPosition = new Vector2(510, 0);
+                    parent.SetScreenSize(1020, 600);
                 }
                 break;
             case GameState.PlayingVS:
@@ -136,7 +136,7 @@ class GameWorld
         switch (gameState)
         {
             case GameState.StartScreen:
-                spriteBatch.Draw(StartScreen, Vector2.Zero, Color.White);
+                spriteBatch.Draw(StartScreen, new Vector2(-30, 0), Color.White);
                 break;
             case GameState.PlayingVS:
                 grid2.Draw(gameTime, spriteBatch);
@@ -145,17 +145,17 @@ class GameWorld
                 grid1.Draw(gameTime, spriteBatch);
                 break;
             case GameState.GameOverSinglePlayer:
-                spriteBatch.Draw(GameOverSinglePlayer, Vector2.Zero, Color.White);
+                spriteBatch.Draw(GameOverSinglePlayer, new Vector2(-30, 0), Color.White);
                 spriteBatch.DrawString(font, "Score : " + grid1.Score.ToString(), new Vector2(TetrisGame.ScreenSize.X / 2 - 115, TetrisGame.ScreenSize.Y / 2 + 200 ),  Color.Blue, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0f);
                 break;
             case GameState.Player1Wins:
-                spriteBatch.Draw(Player1Wins, Vector2.Zero, Color.White);
+                spriteBatch.Draw(Player1Wins, new Vector2(-30,0), Color.White);
                 break;
             case GameState.Player2Wins:
-                spriteBatch.Draw(Player2Wins, Vector2.Zero, Color.White);
+                spriteBatch.Draw(Player2Wins, new Vector2(-30, 0), Color.White);
                 break;
             case GameState.Tie:
-                spriteBatch.Draw(Tie, Vector2.Zero, Color.White);
+                spriteBatch.Draw(Tie, new Vector2(-30, 0), Color.White);
                 break;
         }
         spriteBatch.End();

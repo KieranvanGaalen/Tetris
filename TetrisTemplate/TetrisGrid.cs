@@ -10,19 +10,20 @@ using System.Collections.Generic;
 /// </summary>
 class TetrisGrid
 {
-    public static Texture2D emptyCell; // The sprite of a single empty cell in the grid.
-    public Vector2 BeginPosition = new Vector2(220, 0);// The position at which this TetrisGrid should be drawn. Also used to draw the collored blocks.
-    public int Width { get { return 12; } } // The number of grid elements in the x-direction.
+    public static Texture2D emptyCell ; // The sprite of a single empty cell in the grid.
+    public Vector2 BeginPosition = new Vector2(250, 0);// The position at which this TetrisGrid should be drawn. Also used to draw the collored blocks.
+    public int Width { get { return 10; } } // The number of grid elements in the x-direction.
     public int Height { get { return 20; } } // The number of grid elements in the y-direction.
-    Random random = new Random();
-    public Color[,] grid = new Color[16, 22]; //De grid is groter dan wat getekend wordt want anders valt de blockgrid buiten de array. De array wordt 2 rechts, 2 links en 2 onder de grid uitgebreid
+    readonly Random random = new Random(); //Random used for creating the new blocks
+    public Color[,] grid = new Color[14, 22]; //The grid is larger than is drawn, it is 2 larger to the left, right and bottom, this is later corrected
     TetrisBlock Block; //The block that is currently active gets stored here.
     public bool ForceBlockDownwards; //A boolian used for indicating that a block is being forced down.
-    public int Score { get; private set; } = 0; //An interger used to keep track of the players score.
+    public int Score { get; private set; } = 0; //An integer used to keep track of the players score.
     private int level = 1; //An interger used to keep track of the players level.
     public bool IsDead = false; //When the blocks can no longer fall down this will be set to true and the game will be over.
-    public double fallingSpeed { get; private set; } = 1; //The current falling speed of the Block.
+    public double FallingSpeed { get; private set; } = 1; //The current falling speed of the Block.
     private TetrisBlock NextBlock;
+    private GhostBlock GhostBlock;
 
     /// <summary>
     /// Creates a new TetrisGrid.
@@ -33,6 +34,7 @@ class TetrisGrid
         emptyCell = TetrisGame.ContentManager.Load<Texture2D>("block");
         NextBlock = new Ipiece(this);
         NewBlock();
+        GhostBlock = new GhostBlock(this);
     }
 
     /// <summary>
@@ -42,6 +44,7 @@ class TetrisGrid
     public void Update(GameTime gameTime)
     {
         Block.Update(gameTime);
+        GhostBlock.Update(gameTime, Block);
     }
 
     //HandleInput methode voor de TetrisGrid.
@@ -58,7 +61,7 @@ class TetrisGrid
     public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys SlamDown, Keys GoDown)
     {
         //This part makes sure that the player can move the block to the left and right.
-        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0) //Zorgt voor een interval zodat de shape niet te snel beweegt
+        if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0) //Makes sure the movement is not to fast
         {
             Block.MoveRight();
         }
@@ -98,23 +101,23 @@ class TetrisGrid
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         Vector2 position = BeginPosition;
-        //Tekent de gekleurde blokjes en de achtergrond grid.
+        //Draws the colored blocks and the background grid
         for (int i = 0; i < Width; i++)
         {
             for (int f = 0; f < Height; f++)
             {
-                spriteBatch.Draw(emptyCell, position, grid[i + 2, f]); //Omdat de array groter is dan de daadwerkelijke grid moet de grid opgeschoven worden door waar getekend wordt naar rechts te schuiven
+                spriteBatch.Draw(emptyCell, position, grid[i + 2, f]); //The array is 2 larger to the left and to the right, but the grid starts at 0, this is corrected by moving the grid 2 to the right, or x+2
                 position.Y += 30;
             }
             position.Y = 0;
             position.X += 30;
         }
-
+        GhostBlock.Draw(gameTime, spriteBatch);
         Block.Draw(gameTime, spriteBatch);
         NextBlock.Draw(gameTime, spriteBatch);
-        spriteBatch.DrawString(GameWorld.font, "Next Block : ", new Vector2(380 + BeginPosition.X, 5 + BeginPosition.Y), Color.Blue);
-        spriteBatch.DrawString(GameWorld.font, "Score : " + Score.ToString(), new Vector2(380 + BeginPosition.X, 155 + BeginPosition.Y), Color.Blue); //Tekent de Score van de speler.
-        spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(380 + BeginPosition.X, 175 + BeginPosition.Y), Color.Blue); //Tekent welk level de speler momenteel in zit.
+        spriteBatch.DrawString(GameWorld.font, "Next Block : ", new Vector2(350 + BeginPosition.X, 5 + BeginPosition.Y), Color.Blue);
+        spriteBatch.DrawString(GameWorld.font, "Score : " + Score.ToString(), new Vector2(350 + BeginPosition.X, 155 + BeginPosition.Y), Color.Blue); //Draws the players score
+        spriteBatch.DrawString(GameWorld.font, "Level : " + level.ToString(), new Vector2(350 + BeginPosition.X, 175 + BeginPosition.Y), Color.Blue); //Draws the players level
     }
 
     /// <summary>
@@ -147,11 +150,11 @@ class TetrisGrid
                 NextBlock = new Tpiece(this);
                 break;
         }
-        Block.BlockPosition = new Vector2(6, 0); //Dit is de positie waar een blok dat nieuw de grid binnenkomt moet beginnen.
+        Block.BlockPosition = new Vector2(6, 0); //This is the position that a new block is first drawn on the grid
     }
 
     /// <summary>
-    /// Checks weither there are any rows filled with blocks. If a row is filled, it removes that row, awards the player with points and moves all rows above one row down.
+    /// Checks whether there are any rows filled with blocks. If a row is filled, it removes that row, awards the player with points and moves all rows above one row down.
     /// </summary>
     public void CheckRows()
     {
@@ -177,7 +180,7 @@ class TetrisGrid
                 Multiplier += Multiplier;
                 if (Score / 100 != level - 1)
                 {
-                    fallingSpeed *= 1.2;
+                    FallingSpeed *= 1.2;
                     level++;
                 }
             }
@@ -185,7 +188,7 @@ class TetrisGrid
     }
 
     /// <summary>
-    /// Clears the grid.                                Als we deze later niet meer gebruiken -> voeg samen met reset()
+    /// Clears the grid.
     /// </summary>
     public void Clear() 
     {
@@ -212,7 +215,7 @@ class TetrisGrid
         NewBlock();
         Score = 0;
         level = 1;
-        fallingSpeed = 1;
+        FallingSpeed = 1;
         BeginPosition = new Vector2(220, 0);
         IsDead = false;
     }
