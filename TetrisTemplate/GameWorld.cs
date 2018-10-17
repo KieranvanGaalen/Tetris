@@ -81,11 +81,11 @@ class GameWorld
                 break;
             case GameState.PlayingVS:
                 if(!grid2.IsDead)
-                    grid2.HandleInput(gameTime, inputHelper, Keys.J, Keys.L, Keys.O, Keys.U, Keys.T, Keys.K);
+                    grid2.HandleInput(gameTime, inputHelper, Keys.J, Keys.L, Keys.O, Keys.U, Keys.I, Keys.K);
                 goto case GameState.PlayingSinglePlayer;
             case GameState.PlayingSinglePlayer:
                 if(!grid1.IsDead)
-                    grid1.HandleInput(gameTime, inputHelper, Keys.A, Keys.D, Keys.E, Keys.Q, Keys.T, Keys.S);
+                    grid1.HandleInput(gameTime, inputHelper, Keys.A, Keys.D, Keys.E, Keys.Q, Keys.W, Keys.S);
                 break;
         }
     }

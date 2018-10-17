@@ -110,6 +110,19 @@ class TetrisBlock
         BlockPosition.Y += 1;
     }
 
+    public void SlamDown()
+    {
+        while(true)
+        {
+            if (IsBlockBelow())
+            {
+                PlaceBlock();
+                return;
+            }
+            BlockPosition.Y += 1;
+        }
+    }
+
     /// <summary>
     /// Checks if the block can move to the left and then moves the block 1 position to the left (if possable). 
     /// </summary>

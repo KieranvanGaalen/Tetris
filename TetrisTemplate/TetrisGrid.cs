@@ -55,7 +55,7 @@ class TetrisGrid
     /// <param name="RotateCW">When this key is pressed the currently active block is (if possable) rotated 90 degrees Clockwise.</param>
     /// <param name="RotateCCW">When this key is pressed the currently active block is (if possable) rotated 90 degrees CounterClockwise.</param>
     /// <param name="GoDown">While this key is pressed the currently active block will move down through the grid at an accelerated speed.</param>
-    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys Test, Keys GoDown)
+    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys LeftMove, Keys RightMove, Keys RotateCW, Keys RotateCCW, Keys SlamDown, Keys GoDown)
     {
         //This part makes sure that the player can move the block to the left and right.
         if (inputHelper.KeyDown(RightMove) && gameTime.TotalGameTime.Ticks % 6 == 0) //Zorgt voor een interval zodat de shape niet te snel beweegt
@@ -86,8 +86,8 @@ class TetrisGrid
         else
             ForceBlockDownwards = false;
 
-        if (inputHelper.KeyPressed(Test)) //Dit is alleen om te testen en moet later verwijderd worden.
-            Clear(); //Dit is alleen om te testen en moet later verwijderd worden.
+        if (inputHelper.KeyPressed(SlamDown)) 
+            Block.SlamDown();
     }
     
     /// <summary>
