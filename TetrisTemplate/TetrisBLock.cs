@@ -57,6 +57,7 @@ class TetrisBlock
                     parent.grid[(int)BlockPosition.X + i, (int)BlockPosition.Y + f] = color;
             }
         }
+        GameWorld.BlockPlaced.Play();
         parent.CheckRows();
         if (BlockPosition == new Vector2(6, 0))
             parent.IsDead = true;

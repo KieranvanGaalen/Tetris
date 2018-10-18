@@ -180,10 +180,12 @@ class TetrisGrid
                 Score = Score + 10*Multiplier;
                 TotalScore = TotalScore + 10 * Multiplier;
                 Multiplier += Multiplier;
+                GameWorld.RowComplete.Play();
                 if (TotalScore / 100 != level - 1)
                 {
                     FallingSpeed *= 1.2;
                     level++;
+                    GameWorld.LevelUp.Play();
                 }
             }
         }

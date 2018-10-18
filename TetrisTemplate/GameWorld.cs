@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 using System;
 
 /// <summary>
@@ -42,6 +43,9 @@ class GameWorld
     public static Texture2D Tie;
     public static Texture2D SideBar;
     public static Texture2D Bomb;
+    public static SoundEffect BlockPlaced;
+    public static SoundEffect RowComplete;
+    public static SoundEffect LevelUp;
 
     /// <summary>
     /// The current game state.
@@ -76,6 +80,9 @@ class GameWorld
         Tie = TetrisGame.ContentManager.Load<Texture2D>("GameOverTie");
         SideBar = TetrisGame.ContentManager.Load<Texture2D>("SideBar");
         Bomb = TetrisGame.ContentManager.Load<Texture2D>("Bomb");
+        BlockPlaced = TetrisGame.ContentManager.Load<SoundEffect>("BlockPlaced");
+        RowComplete = TetrisGame.ContentManager.Load<SoundEffect>("RowComplete");
+        LevelUp = TetrisGame.ContentManager.Load<SoundEffect>("LevelUp");
         grid1 = new TetrisGrid();
         grid2 = new TetrisGrid();
         VSSideBarPlayer1 = new VSSideBar(this, grid1, grid2);
@@ -156,8 +163,11 @@ class GameWorld
                 if (!grid1.IsDead)
                     grid1.Update(gameTime);
                 else if (gameState == GameState.PlayingSinglePlayer)
+                {
                     gameState = GameState.GameOverSinglePlayer;
-                break;
+                    parent.SetScreenSize(800, 600);
+                }
+                    break;
         }
     }
 

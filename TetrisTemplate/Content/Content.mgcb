@@ -116,3 +116,21 @@
 /processorParam:TextureFormat=Color
 /build:Bomb.png
 
+#begin LevelUp.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:LevelUp.wav
+
+#begin RowComplete.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:RowComplete.wav
+
+#begin BlockPlaced.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:BlockPlaced.wav
+
