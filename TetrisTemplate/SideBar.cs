@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// <summary>
 /// A class for representing a SideBar.
 /// </summary>
-class SideBar
+class SideBar //The sidebar for the normal playing mode
 {
     protected TetrisGrid MyGrid;
     protected GameWorld parent;
@@ -24,7 +24,7 @@ class SideBar
     }
 }
 
-class VSSideBar : SideBar
+class VSSideBar : SideBar //The sidebar for the VS mode
 {
     TetrisGrid EnemyGrid;
     TetrisBlock DotExample;
@@ -41,7 +41,7 @@ class VSSideBar : SideBar
         BombExample.BlockPosition = new Vector2(14, 19);
     }
 
-    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys BadBlock, Keys EzBlock, Keys Bomb)
+    public void HandleInput(GameTime gameTime, InputHelper inputHelper, Keys BadBlock, Keys EzBlock, Keys Bomb) //Handles the input for the special options in VS mode
     {
         if (inputHelper.KeyPressed(BadBlock) && MyGrid.Score >= 90)
         {
@@ -62,7 +62,7 @@ class VSSideBar : SideBar
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch, string BadBlockKey, string EzBlockKey, string BombKey)
     {
-        base.Draw(gameTime, spriteBatch);
+        base.Draw(gameTime, spriteBatch); //Draws the different information in the sidebar
         spriteBatch.DrawString(GameWorld.font, BadBlockKey + ": send bad block", new Vector2(320 + MyGrid.BeginPosition.X, 220 + MyGrid.BeginPosition.Y), Color.Blue);
         spriteBatch.DrawString(GameWorld.font, "to the enemy", new Vector2(320 + MyGrid.BeginPosition.X, 235 + MyGrid.BeginPosition.Y), Color.Blue);
         spriteBatch.DrawString(GameWorld.font, "Cost: 90", new Vector2(320 + MyGrid.BeginPosition.X, 250 + MyGrid.BeginPosition.Y), Color.Blue);
@@ -80,7 +80,7 @@ class VSSideBar : SideBar
         BombExample.Draw(gameTime, spriteBatch);
     }
 
-    private TetrisBlock MakeBadBlock()
+    private TetrisBlock MakeBadBlock() //Randomly generates a bad block
     {
         TetrisBlock BadBlock = new Opiece(EnemyGrid);
         switch (GameWorld.Random.Next(5))

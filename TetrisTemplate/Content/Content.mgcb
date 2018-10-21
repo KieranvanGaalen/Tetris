@@ -134,3 +134,9 @@
 /processorParam:Quality=Best
 /build:BlockPlaced.wav
 
+#begin Cognitive Dissonance.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Cognitive Dissonance.mp3
+

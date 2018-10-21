@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 using System;
 
 /// <summary>
@@ -46,6 +47,7 @@ class GameWorld
     public static SoundEffect BlockPlaced;
     public static SoundEffect RowComplete;
     public static SoundEffect LevelUp;
+    public static Song BackGroundMusic;
 
     /// <summary>
     /// The current game state.
@@ -83,24 +85,28 @@ class GameWorld
         BlockPlaced = TetrisGame.ContentManager.Load<SoundEffect>("BlockPlaced");
         RowComplete = TetrisGame.ContentManager.Load<SoundEffect>("RowComplete");
         LevelUp = TetrisGame.ContentManager.Load<SoundEffect>("LevelUp");
+        BackGroundMusic = TetrisGame.ContentManager.Load<Song>("Cognitive Dissonance"); //Music: Cognitive Dissonance by Kevin Macleod
         grid1 = new TetrisGrid();
         grid2 = new TetrisGrid();
         VSSideBarPlayer1 = new VSSideBar(this, grid1, grid2);
         VSSideBarPlayer2 = new VSSideBar(this, grid2, grid1);
+        MediaPlayer.Volume = (float)0.2;
     }
 
-    public void HandleInput(GameTime gameTime, InputHelper inputHelper)
+    public void HandleInput(GameTime gameTime, InputHelper inputHelper) //Handles the input for each gamestate
     {
         if (gameState != GameState.StartScreen && inputHelper.KeyPressed(Keys.Escape))
             Reset();
         switch (gameState)
         {
-            case GameState.StartScreen:
+            case GameState.StartScreen: //Handles the input for the main menu
                 if (inputHelper.KeyPressed(Keys.Space))
                 {
                     gameState = GameState.PlayingSinglePlayer;
                     grid1.Reset();
                     parent.SetScreenSize(480, 600);
+                    MediaPlayer.Play(BackGroundMusic);
+                    MediaPlayer.IsRepeating = true;
                 }
                 else if (inputHelper.KeyPressed(Keys.Enter))
                 {
@@ -109,6 +115,8 @@ class GameWorld
                     grid2.Reset();
                     grid2.BeginPosition = new Vector2(480, 0);
                     parent.SetScreenSize(960, 600);
+                    MediaPlayer.Play(BackGroundMusic);
+                    MediaPlayer.IsRepeating = true;
                 }
                 else if (inputHelper.KeyPressed(Keys.LeftShift))
                 {
@@ -117,8 +125,11 @@ class GameWorld
                     grid2.Reset();
                     grid2.BeginPosition = new Vector2(480, 0);
                     parent.SetScreenSize(960, 600);
+                    MediaPlayer.Play(BackGroundMusic);
+                    MediaPlayer.IsRepeating = true;
                 }
                 break;
+                //Handles the input for the different playing modes
             case GameState.PlayingVSMode:
                 VSSideBarPlayer1.HandleInput(gameTime, inputHelper, Keys.Z, Keys.X, Keys.C);
                 VSSideBarPlayer2.HandleInput(gameTime, inputHelper, Keys.M, Keys.OemComma, Keys.OemPeriod);
@@ -134,7 +145,7 @@ class GameWorld
         }
     }
 
-    public void Update(GameTime gameTime)
+    public void Update(GameTime gameTime) //Updates for each gamestate
     {
         switch(gameState)
         {
@@ -174,7 +185,7 @@ class GameWorld
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         spriteBatch.Begin();
-        switch (gameState)
+        switch (gameState) //Draws the sprites for each gamestate
         {
             case GameState.StartScreen:
                 spriteBatch.Draw(StartScreen, Vector2.Zero, Color.White);
@@ -210,7 +221,7 @@ class GameWorld
         spriteBatch.End();
     }
 
-    public void Reset()
+    public void Reset() //Resets back to the main menu
     {
         gameState = GameState.StartScreen;
         parent.SetScreenSize(800, 600);

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 
 
-class FullOpiece : TetrisBlock
+class FullOpiece : TetrisBlock //Assigns the blockgrids for the special VS mode blocks
 {
     public FullOpiece(TetrisGrid parent) : base(parent)
     {

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 
-class GhostBlock : TetrisBlock
+class GhostBlock : TetrisBlock //The preview of where your block will land
 {
     public GhostBlock(TetrisGrid parent) : base(parent)
     {
@@ -17,13 +17,13 @@ class GhostBlock : TetrisBlock
         BlockGrid[1, 3] = true;
     }
 
-    public void Clone(TetrisBlock Block)
+    public void Clone(TetrisBlock Block) //Copies the information from your current block
     {
         BlockGrid = Block.BlockGrid;
         BlockPosition = Block.BlockPosition;
     }
 
-    public override void SlamDown()
+    public override void SlamDown() //Takes it down but doesn't place it to see what the lowest position is
     {
         while (true)
         {
@@ -43,7 +43,7 @@ class GhostBlock : TetrisBlock
 
 class Dot : TetrisBlock
 {
-    public Dot(TetrisGrid parent) : base(parent)
+    public Dot(TetrisGrid parent) : base(parent) //Assigns the grid for the dot block
     {
         color = Color.Gold;
         BlockGrid = new bool[1, 1];
@@ -53,14 +53,14 @@ class Dot : TetrisBlock
 
 class Bomb : TetrisBlock
 {
-    public Bomb(TetrisGrid parent) : base(parent)
+    public Bomb(TetrisGrid parent) : base(parent) //Assigns the grid for the bomb block
     {
         color = Color.DimGray;
         BlockGrid = new bool[1, 1];
         BlockGrid[0, 0] = true;
     }
 
-    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    public override void Draw(GameTime gameTime, SpriteBatch spriteBatch) //Draws the bomb block
     {
         Vector2 position = parent.BeginPosition;
         //Sets the coordinates of the top left of the block
