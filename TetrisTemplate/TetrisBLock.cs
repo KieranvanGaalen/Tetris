@@ -251,7 +251,7 @@ class TetrisBlock
     }
 
 }
-
+//Grid assignments for the different standard blocks
 class Opiece : TetrisBlock
 {
     public Opiece(TetrisGrid parent) : base(parent)
